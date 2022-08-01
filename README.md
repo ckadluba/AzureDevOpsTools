@@ -1,13 +1,12 @@
 # RemoveAzureGitRepoWritePermissions
 
-A PowerShell script to remove all read permissions from an Azure DevOps git repository.
+A PowerShell script to remove all write permissions from an Azure DevOps git repository.
 
-Sometimes old repositories should be set read only "deactivated" in a way, that nobody can change the code anymore while keeping them
-readable for reference purposes. In these cases disabling the repository is not a good option, because then it does not appear in the list of repositories in the UI anymore. This script can be used instead to remove all [write permissions](#write-permissions) from the repository. 
+Sometimes old repositories should be "deactivated" in a way, that nobody can change the code anymore while keeping it
+readable for reference purposes. In these cases disabling the repository is not a good option, because then it does not appear in the list of repositories in the UI anymore. This script can be used to remove all [write permissions](#write-permissions) from the repository. 
 
 This script does the following modifications for all ACLs of a given repository
 
-1. Disable permission inheritance
 1. Removed explicit allow of [write permissions](#write-permissions) on all existing ACEs 
 1. Set an explicit deny of [write permissions](#write-permissions) on all existing ACEs for the following actions: 
 1. Display modfied ACLs and ACEs with old and new values
