@@ -189,7 +189,8 @@ function SetGitRepoAcl($orgName, $securityNamespaceId, $acl)
 
 # Begin of main script
 
-if ($null -eq $env:RemoveAzureGitRepoWritePermissions_PAT) {
+if ($null -eq $env:RemoveAzureGitRepoWritePermissions_PAT)
+{
     throw "Please set the environment variable RemoveAzureGitRepoWritePermissions_PAT to a valid PAT token with Code: read and Security: manage permissions."
 }
 
