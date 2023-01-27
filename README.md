@@ -1,4 +1,6 @@
-# RemoveAzureGitRepoWritePermissions
+# AzureGitRepoPermissionTools
+
+## RemoveAzureGitRepoWritePermissions
 
 A PowerShell script to remove all write permissions from an Azure DevOps git repository.
 
@@ -29,7 +31,7 @@ PullRequestBypassPolicy
 # Usage
 
 1. In Azure DevOps UI create a PAT token in Azure DevOps that has the permissions __Code: read__, __Identity: read__ and __Security: manage__ in your project.  
-1. Create the environment variable `RemoveAzureGitRepoWritePermissions_PAT` containing the PAT token.
+1. Create the environment variable `AzureGitRepoPermissionTools_PAT` containing the PAT token.
 1. Get the organisation, project name and repository name from the Azure DevOps UI.
 1. Run the script to remove all [write permissions](#write-permissions) from the repository.
    ```powershell
