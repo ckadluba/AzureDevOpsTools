@@ -1,14 +1,14 @@
 [CmdletBinding()]
 param (
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string]
     $Url,
 
-    [Parameter(Mandatory=$false)]
+    [Parameter(Mandatory = $false)]
     [string]
     $Method = "GET",
 
-    [Parameter(Mandatory=$false)]
+    [Parameter(Mandatory = $false)]
     [System.Management.Automation.PSObject]
     $Acl = $null
 )
@@ -16,12 +16,12 @@ param (
 
 # Begin of main script
 
-if ($null -eq $env:AzureGitRepoPermissionTools_PAT)
+if ($null -eq $env:AzureGitRepoTools_PAT)
 {
-    throw "Please set the environment variable AzureGitRepoPermissionTools_PAT to a valid PAT token with Code: read and Security: manage permissions."
+    throw "Please set the environment variable AzureGitRepoTools_PAT to a valid PAT token with Code: read and Security: manage permissions."
 }
 
-$authString = 'Basic ' + [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(":" + $env:AzureGitRepoPermissionTools_PAT))
+$authString = 'Basic ' + [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(":" + $env:AzureGitRepoTools_PAT))
 
 $requestArgs = @{
     Method      = $Method

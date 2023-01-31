@@ -1,18 +1,18 @@
 [CmdletBinding()]
 param (
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string]
     $OrgName,
 
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string]
     $ProjectName,
 
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string]
     $RepoName,
 
-    [Parameter()]
+    [Parameter(Mandatory = $false)]
     [switch]
     $Confirm
 )
@@ -85,7 +85,8 @@ Write-Host
 Write-Host "Original permission values"
 Write-Host "--------------------------"
 $repoAcls = & "$PSScriptRoot\Helpers\Get-RepoPermissions.ps1" -OrgName $OrgName -GitSecNamespace $gitSecNamespace -GitRepoId $gitRepoId
-& "$PSScriptRoot\Helpers\Show-RepoPermissions.ps1" -OrgName $OrgName -GitSecNamespace $gitSecNamespace -Acls $repoAcls
+$identitiesCache = @{}
+& "$PSScriptRoot\Helpers\Show-RepoPermissions.ps1" -OrgName $OrgName -GitSecNamespace $gitSecNamespace -Acls $repoAcls -IdentitiesCache $identitiesCache
 Write-Host
 
 Write-Host "Removing the following permissions from all ACEs in the repo: $WritePermissions"
@@ -105,5 +106,5 @@ Write-Host
 Write-Host "Updated permission values"
 Write-Host "-------------------------"
 $repoAclsFinal = & "$PSScriptRoot\Helpers\Get-RepoPermissions.ps1" -OrgName $OrgName -GitSecNamespace $gitSecNamespace -GitRepoId $gitRepoId
-& "$PSScriptRoot\Helpers\Show-RepoPermissions.ps1" -OrgName $OrgName -GitSecNamespace $gitSecNamespace -Acls $repoAclsFinal
+& "$PSScriptRoot\Helpers\Show-RepoPermissions.ps1" -OrgName $OrgName -GitSecNamespace $gitSecNamespace -Acls $repoAclsFinal -IdentitiesCache $identitiesCache
 Write-Host

@@ -1,17 +1,18 @@
 [CmdletBinding()]
 param (
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string]
     $OrgName,
 
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     $GitSecNamespace,
 
-    [Parameter(Mandatory=$true)]
-    $Acls
-)
+    [Parameter(Mandatory = $true)]
+    $Acls,
 
-$IdentitiesCache = @{}
+    [Parameter(Mandatory = $false)]
+    $IdentitiesCache = @{}
+)
 
 function DisplayGitRepoAcls($orgName, $acls, $gitSecActions)
 {
@@ -39,7 +40,7 @@ function GetIdentityName($orgName, $descriptor)
     if ($null -eq $displayName)
     {
         $requestUrl =  "https://vssps.dev.azure.com/$orgName/_apis/identities?descriptors=$($descriptor)"
-        $response = & "$PSScriptRoot\Call-ApiWithToken.ps1" $requestUrl
+        $response = & "$PSScriptRoot\Call-ApiWithToken.ps1" -Url $requestUrl
         $displayName = $response[0].DisplayName
 
         $IdentitiesCache.Add($descriptor, $displayName)
@@ -53,14 +54,9 @@ function RenderPermissionsValue($bits, $actions)
     {
         $bits = 0
     }
-    $binary = ToStringBinary $bits
+    $binary = & "$PSScriptRoot\ConvertTo-StringBinary.ps1" -Bits $bits
     $perms = ExpandPermissions $bits $actions
     "$binary $perms"
-}
-
-function ToStringBinary($bits)
-{
-    [Convert]::ToString($bits, 2).PadLeft(16, '0')    
 }
 
 function ExpandPermissions($bits, $actions)
