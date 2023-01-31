@@ -122,8 +122,10 @@ function AddAclPermissionProperties($actions, $combinedSum)
 if (-not $ExcludePermissions.IsPresent)
 {
     $gitSecNamespace = & "$PSScriptRoot\Helpers\Get-RepoSecurityNamespace.ps1" -OrgName $OrgName
-    if ($null -eq $gitSecNamespace) {
-        throw "Git repos security namespace not found found for org $OrgName"
+    if ($null -eq $gitSecNamespace)
+    {
+        Write-Error "Git repos security namespace not found found for org $OrgName"
+        exit 1
     }
 }
 
@@ -132,7 +134,8 @@ if ($ProjectName -eq "")
     # Get repos from all projects
     $requestUrl = "https://dev.azure.com/$OrgName/_apis/projects?api-version=7.0"
     $projects = & "$PSScriptRoot\Helpers\Call-ApiWithToken.ps1" $requestUrl
-    foreach ($project in $projects.Value) {
+    foreach ($project in $projects.Value)
+    {
         GetReposOfProject $OrgName $project.Name $ExcludePermissions $gitSecNamespace
     }
 }
