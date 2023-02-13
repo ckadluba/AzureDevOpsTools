@@ -1,6 +1,6 @@
 # AzureDevOpsTools
 
-A set of PowerShell scripts to accomplish different tasks on Azure DevOps git repositories.
+A set of PowerShell scripts to accomplish different tasks in Azure DevOps.
 
 ## Getting Started 
 
