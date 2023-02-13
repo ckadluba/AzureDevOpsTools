@@ -1,4 +1,4 @@
-# AzureGitRepoTools
+# AzureDevOpsTools
 
 A set of PowerShell scripts to accomplish different tasks on Azure DevOps git repositories.
 
@@ -15,9 +15,9 @@ You need one or two things before you can start. :)
 ### Setting the PAT token
 
 1. In Azure DevOps UI create a PAT token in Azure DevOps that has the permissions mentioned below.  
-1. Create the environment variable `AzureGitRepoTools_PAT` containing the PAT token.
+1. Create the environment variable `AzureDevOpsTools_PAT` containing the PAT token.
 
-## Get-AzureGitRepos
+## Get-AdoGitRepos
 
 Gets a list of all git repositories within a specified organisation or within a specified project. The output includes information about the last commit and the combined types of permissions set on the repo.
 
@@ -26,13 +26,13 @@ Gets a list of all git repositories within a specified organisation or within a 
 Get data of all git repos in organisation "myorganisation" and project "MyProject".
 
 ```powershell
-.\Get-AzureGitRepos.ps1 -OrgName "myorganisation" -ProjectName "MyProject"
+.\Get-AdoGitRepos.ps1 -OrgName "myorganisation" -ProjectName "MyProject"
 ```
 
 Get data of all git repos in all projects of organisation "myorganisation" and write ouput as CSV to file myorganisation-repos.csv.
 
 ```powershell
-.\Get-AzureGitRepos.ps1 -OrgName "myorganisation" | ConvertTo-Csv > myorganisation-repos.csv
+.\Get-AdoGitRepos.ps1 -OrgName "myorganisation" | ConvertTo-Csv > myorganisation-repos.csv
 ```
 
 ### Parameters
@@ -48,7 +48,7 @@ Get data of all git repos in all projects of organisation "myorganisation" and w
 
 * Azure DevOps PAT token permission: __Code: read__
 
-## Show-AzureGitRepoPermissions
+## Show-AdoGitRepoPermissions
 
 Displays the permissions (access control lists) of a specified repository.
 
@@ -57,7 +57,7 @@ Displays the permissions (access control lists) of a specified repository.
 Show permissions (access control lists) set on repository "MyRepo" in project "MyProject" if organisation "myorganisation".
 
 ```powershell
-.\Show-AzureGitRepoPermissions.ps1 -OrgName "myorganisation" -ProjectName "MyProject" -RepoName "MyRepo"
+.\Show-AdoGitRepoPermissions.ps1 -OrgName "myorganisation" -ProjectName "MyProject" -RepoName "MyRepo"
 ```
 
 ### Parameters
@@ -108,7 +108,7 @@ PullRequestBypassPolicy
 Remove all write permissions from the ACL of the repository "MyRepo" in project "MyProject" if organisation "myorganisation".
 
 ```powershell
-.\Remove-AzureGitRepoWritePermissions.ps1 -OrgName "myorganisation" -ProjectName "MyProject" -RepoName "MyRepo"
+.\Remove-AdoGitRepoWritePermissions.ps1 -OrgName "myorganisation" -ProjectName "MyProject" -RepoName "MyRepo"
 ```
 
 ### Parameters
