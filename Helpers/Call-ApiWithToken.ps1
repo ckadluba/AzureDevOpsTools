@@ -10,7 +10,7 @@ param (
 
     [Parameter(Mandatory = $false)]
     [System.Management.Automation.PSObject]
-    $Acl = $null
+    $Body = $null
 )
 
 
@@ -26,17 +26,12 @@ $authString = 'Basic ' + [Convert]::ToBase64String([Text.Encoding]::ASCII.GetByt
 $requestArgs = @{
     Method      = $Method
     Uri         = $Url
-    Headers     = @{Authorization = $authString }
+    Headers     = @{ Authorization = $authString }
 }
 
-if ($null -ne $Acl)
+if ($null -ne $Body)
 {
-    $requestBody = @{
-        "count" = 1
-        "value" = @( $Acl )
-    }
-
-    $requestArgs.Body        = $requestBody | ConvertTo-Json -Depth 6
+    $requestArgs.Body        = $Body | ConvertTo-Json -Depth 10
     $requestArgs.ContentType = "application/json"
 }
 

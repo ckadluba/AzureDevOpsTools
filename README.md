@@ -129,3 +129,57 @@ Remove all write permissions from the ACL of the repository "MyRepo" in project 
 ### Disclaimer
 
 This script can remove permissions from your repositories. It can be very helpful and save you some time. But please be aware that, __you are using this script at your own risk__. I'm not responsible for any damage done by misuse or by any bugs that might exist in the script.
+
+## GetAdoVariableGroups
+
+Get contents of one or more variable groups.
+
+### Usage
+
+Get variable group "MyVariableGroup" in project "MyProject" if organisation "myorganisation".
+
+```powershell
+.\Get-AdoVariableGroups.ps1 -OrgName "myorganisation" -ProjectName "MyProject" -VargroupNames @( "MyVariableGroup" )
+```
+
+Get variable groups "MyGroup.Dev" and "MyGroup.Prod" in project "MyProject" if organisation "myorganisation" as CSV to file mygroup-vars.csv.
+
+```powershell
+.\Get-AdoVariableGroups.ps1 -OrgName "myorganisation" -ProjectName "MyProject" -VargroupNames @( "MyGroup.Dev", "MyGroup.Prod" ) | ConvertTo-Csv > mygroup-vars.csv
+```
+
+### Parameters
+
+* OrgName (mandatory)  
+  The name of the Azure DevOps organisation to use.
+* ProjectName (mandatory)  
+  The name of the Azure DevOps project where the variable group is located.
+* VargroupName (mandatory)  
+  The name of the variable group.
+* Raw (optional)  
+  If this is set, the script will return raw objects instead of flattened key-value collections. This is suitable to keep all information returned by the API for subsequent processing.
+
+### PAT Permissions
+
+* Azure DevOps PAT token permission: __Variable Groups: read__
+
+## UpdateAdoVariableGroups
+
+Performs regex replacing in variable values of one or more variable groups.
+
+### Usage
+
+TO DO
+
+### Parameters
+
+* OrgName (mandatory)  
+  The name of the Azure DevOps organisation to use.
+* ProjectName (mandatory)  
+  The name of the Azure DevOps project where the variable group is located.
+
+TO DO
+
+### PAT Permissions
+
+* Azure DevOps PAT token permission: __Variable Groups: read, create, & manage__
