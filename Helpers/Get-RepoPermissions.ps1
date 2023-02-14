@@ -23,7 +23,7 @@ $allRepoAclsResponse = & "$PSScriptRoot\Call-ApiWithToken.ps1" -Url $requestUrl
 $allRepoAcls = $allRepoAclsResponse.value
 $acls = $allRepoAcls | Where-Object { $_.token.StartsWith("repoV2") -and $_.token.EndsWith($GitRepoId) }
 
-if ($null -eq $acls) 
+if ($null -eq $acls)
 {
     Write-Warning "No ACLs found for git repo $GitRepoId"
 }

@@ -34,13 +34,24 @@ function RemoveWritePermissionsFromAcls($acls, $gitSecActions)
     {
         foreach ($ace in $acl.acesDictionary.PSObject.Properties)
         {
-            RemovePermissionFromAce $ace $WritePermissions $gitSecActions
+            RemovePermissionFromAce -inputAce $ace -removeActionNames $WritePermissions -actions $gitSecActions
         }
     }
 }
 
-function RemovePermissionFromAce($inputAce, $removeActionNames, $actions)
+function RemovePermissionFromAce
 {
+    param (
+        [Parameter(Mandatory = $true)]
+        $inputAce,
+
+        [Parameter(Mandatory = $true)]
+        $removeActionNames,
+
+        [Parameter(Mandatory = $true)]
+        $actions
+    )
+
     $removeActions = $actions | Where-Object { $removeActionNames.Contains($_.name) }
     $removeActionBits = 0
     $removeActions | ForEach-Object { $removeActionBits = $_.bit -bor $removeActionBits }
@@ -50,16 +61,38 @@ function RemovePermissionFromAce($inputAce, $removeActionNames, $actions)
     $inputAce.Value.deny = $inputAce.Value.deny -bor $removeActionBits
 }
 
-function SetGitRepoAcls($orgName, $securityNamespaceId, $acls)
+function SetGitRepoAcls
 {
+    param (
+        [Parameter(Mandatory = $true)]
+        $orgName,
+
+        [Parameter(Mandatory = $true)]
+        $securityNamespaceId,
+
+        [Parameter(Mandatory = $true)]
+        $acls
+    )
+
     foreach ($acl in $acls)
     {
-        SetGitRepoAcl $orgName $securityNamespaceId $acl
+        SetGitRepoAcl -orgName $orgName -securityNamespaceId $securityNamespaceId -acl $acl
     }
 }
 
-function SetGitRepoAcl($orgName, $securityNamespaceId, $acl)
+function SetGitRepoAcl
 {
+    param (
+        [Parameter(Mandatory = $true)]
+        $orgName,
+
+        [Parameter(Mandatory = $true)]
+        $securityNamespaceId,
+
+        [Parameter(Mandatory = $true)]
+        $acl
+    )
+
     $requestUrl = "https://dev.azure.com/$orgName/_apis/accesscontrollists/$($securityNamespaceId)?api-version=7.1-preview.1"
     $requestBody = @{
         "count" = 1
@@ -96,7 +129,7 @@ $identitiesCache = @{}
 Write-Host
 
 Write-Host "Removing the following permissions from all ACEs in the repo: $WritePermissions"
-if ($Confirm.IsPresent -eq $false)
+if (-not $Confirm.IsPresent)
 {
     $confirmation = Read-Host "Do you want to continue?`n[Y] Yes  [N] No  (default is ""N"")"
     if ($confirmation -ne "y")
@@ -105,7 +138,7 @@ if ($Confirm.IsPresent -eq $false)
     }
 }
 RemoveWritePermissionsFromAcls $repoAcls $gitSecNamespace.actions
-SetGitRepoAcls $OrgName $gitSecNamespace.namespaceId $repoAcls
+SetGitRepoAcls -orgName $OrgName -securityNamespaceId $gitSecNamespace.namespaceId -acls $repoAcls
 Start-Sleep 2  # Give API time to persist values before reading them back
 Write-Host
 

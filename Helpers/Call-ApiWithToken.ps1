@@ -18,7 +18,7 @@ param (
 
 if ($null -eq $env:AzureDevOpsTools_PAT)
 {
-    throw "Please set the environment variable AzureDevOpsTools_PAT to a valid PAT token with Code: read and Security: manage permissions."
+    throw "Please set the environment variable AzureDevOpsTools_PAT to a valid PAT token with adequate permissions."
 }
 
 $authString = 'Basic ' + [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(":" + $env:AzureDevOpsTools_PAT))

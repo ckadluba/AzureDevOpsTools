@@ -14,8 +14,23 @@ param (
     $IdentitiesCache = @{}
 )
 
-function DisplayGitRepoAcls($orgName, $acls, $gitSecActions)
+function DisplayGitRepoAcls
 {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]
+        $orgName,
+
+        [Parameter(Mandatory = $true)]
+        $acls,
+
+        [Parameter(Mandatory = $true)]
+        $gitSecActions,
+
+        [Parameter(Mandatory = $true)]
+        $identitiesCache
+    )
+
     foreach ($acl in $acls)
     {
         Write-Host " - ACL"
@@ -24,19 +39,32 @@ function DisplayGitRepoAcls($orgName, $acls, $gitSecActions)
         foreach ($ace in $acl.acesDictionary.PSObject.Properties)
         {
             Write-Host "    - ACE"
-            $identityName = GetIdentityName $orgName $ace.Value.descriptor
+            $identityName = GetIdentityName -orgName $orgName -descriptor $ace.Value.descriptor -identitiesCache $identitiesCache
             Write-Host "      Descriptor: $identityName"
-            $allowPerms = RenderPermissionsValue $ace.Value.extendedInfo.effectiveAllow $gitSecActions
+            $allowPerms = RenderPermissionsValue -bits $ace.Value.extendedInfo.effectiveAllow -actions $gitSecActions
             Write-Host "      Allow: $allowPerms"
-            $denyPerms = RenderPermissionsValue $ace.Value.extendedInfo.effectiveDeny $gitSecActions
+            $denyPerms = RenderPermissionsValue -bits $ace.Value.extendedInfo.effectiveDeny -actions $gitSecActions
             Write-Host "      Deny:  $denyPerms"
         }
-    }    
+    }
 }
 
-function GetIdentityName($orgName, $descriptor)
+function GetIdentityName
 {
-    $displayName = $IdentitiesCache[$descriptor]
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]
+        $orgName,
+
+        [Parameter(Mandatory = $true)]
+        [string]
+        $descriptor,
+
+        [Parameter(Mandatory = $true)]
+        $identitiesCache
+    )
+
+    $displayName = $identitiesCache[$descriptor]
     if ($null -eq $displayName)
     {
         $requestUrl =  "https://vssps.dev.azure.com/$orgName/_apis/identities?descriptors=$($descriptor)"
@@ -48,8 +76,16 @@ function GetIdentityName($orgName, $descriptor)
     $displayName
 }
 
-function RenderPermissionsValue($bits, $actions)
+function RenderPermissionsValue
 {
+    param (
+        [Parameter(Mandatory = $false)]
+        $bits,
+
+        [Parameter(Mandatory = $true)]
+        $actions
+    )
+
     if ($null -eq $bits)
     {
         $bits = 0
@@ -69,5 +105,5 @@ function ExpandPermissions($bits, $actions)
 
 if ($null -ne $Acls)
 {
-    DisplayGitRepoAcls $OrgName $Acls $GitSecNamespace.actions    
+    DisplayGitRepoAcls -orgName $OrgName -acls $Acls -gitSecActions $GitSecNamespace.actions -identitiesCache $IdentitiesCache
 }

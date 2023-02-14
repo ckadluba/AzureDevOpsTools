@@ -13,13 +13,29 @@ param (
     $ExcludePermissions
 )
 
-function GetReposOfProject($orgName, $projectName, $excludePermissions, $gitSecNamespace)
+function GetReposOfProject
 {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]
+        $orgName,
+
+        [Parameter(Mandatory = $true)]
+        [string]
+        $projectName,
+
+        [Parameter(Mandatory = $true)]
+        $excludePermissions,
+
+        [Parameter(Mandatory = $true)]
+        $gitSecNamespace
+    )
+
     Write-Host "Checking repos for org: $orgName, project: $projectName"
 
     $requestUrl = "https://dev.azure.com/$orgName/$projectName/_apis/git/repositories?includeLinks=true&includeAllUrls=true&includeHidden=true&api-version=7.0"
     $repos = & "$PSScriptRoot\Helpers\Call-ApiWithToken.ps1" -Url $requestUrl
-    
+
     foreach ($repo in $repos.value)
     {
         Write-Host "Checking repo $($repo.name)"
@@ -39,12 +55,12 @@ function GetReposOfProject($orgName, $projectName, $excludePermissions, $gitSecN
         else
         {
             Write-Host "Getting last commit"
-            AddLastCommitInfo $orgName $projectName $gitRepoId $repoObj
+            AddLastCommitInfo -orgName $orgName -projectName $projectName -gitRepoId $gitRepoId -repoObj $repoObj
 
             if (-not $excludePermissions.IsPresent)
             {
                 Write-Host "Getting permissions"
-                AddPermissionsInfo $orgName $gitSecNamespace $gitRepoId $repoObj
+                AddPermissionsInfo -orgName $orgName -gitSecNamespace $gitSecNamespace -gitRepoId $gitRepoId -repoObj $repoObj
             }
         }
 
@@ -54,26 +70,43 @@ function GetReposOfProject($orgName, $projectName, $excludePermissions, $gitSecN
         $repoObj | Add-Member -NotePropertyName "ProjectVisibility" -NotePropertyValue $repo.project.visibility
 
         $repoObj
-    }    
+    }
 }
 
-function AddLastCommitInfo($orgName, $projectName, $gitRepoId, $repoObj)
+function AddLastCommitInfo
 {
-    $requestUrl = "https://dev.azure.com/$orgName/$projectName/_apis/git/repositories/$gitRepoId/commits?api-version=6.1-preview.1" 
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]
+        $orgName,
+
+        [Parameter(Mandatory = $true)]
+        [string]
+        $projectName,
+
+        [Parameter(Mandatory = $true)]
+        [string]
+        $gitRepoId,
+
+        [Parameter(Mandatory = $true)]
+        $repoObj
+    )
+
+    $requestUrl = "https://dev.azure.com/$orgName/$projectName/_apis/git/repositories/$gitRepoId/commits?api-version=6.1-preview.1"
     $commitInfos = & "$PSScriptRoot\Helpers\Call-ApiWithToken.ps1" -Url $requestUrl
     if ($null -eq $commitInfos)
     {
         return
     }
     $lastCommitId = $commitInfos.value.commitId | Select-Object -first 1
-    
+
     $requestUrl = "https://dev.azure.com/$orgName/$projectName/_apis/git/repositories/$gitRepoId/commits/$($lastCommitId)?api-version=6.0-preview.1"
     $lastCommitInfo = & "$PSScriptRoot\Helpers\Call-ApiWithToken.ps1" -Url $requestUrl
     if ($null -eq $lastCommitInfo)
     {
         return
     }
-                    
+
     $repoObj | Add-Member -NotePropertyName "LastCommitId" -NotePropertyValue $lastCommitInfo.commitid
     $repoObj | Add-Member -NotePropertyName "LastCommitAuthorName" -NotePropertyValue $lastCommitInfo.author.name
     $repoObj | Add-Member -NotePropertyName "LastCommitAuthorEmail" -NotePropertyValue $lastCommitInfo.author.email
@@ -81,8 +114,24 @@ function AddLastCommitInfo($orgName, $projectName, $gitRepoId, $repoObj)
     $repoObj | Add-Member -NotePropertyName "LastCommitComment" -NotePropertyValue $lastCommitInfo.comment
 }
 
-function AddPermissionsInfo($orgName, $gitSecNamespace, $gitRepoId, $repoObj)
+function AddPermissionsInfo
 {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]
+        $orgName,
+
+        [Parameter(Mandatory = $true)]
+        $gitSecNamespace,
+
+        [Parameter(Mandatory = $true)]
+        [string]
+        $gitRepoId,
+
+        [Parameter(Mandatory = $true)]
+        $repoObj
+    )
+
     $acls = & "$PSScriptRoot\Helpers\Get-RepoPermissions.ps1" -OrgName $orgName -GitSecNamespace $gitSecNamespace -GitRepoId $gitRepoId
     if ($null -eq $acls)
     {
@@ -100,11 +149,19 @@ function AddPermissionsInfo($orgName, $gitSecNamespace, $gitRepoId, $repoObj)
     $combinedAllowDenySumString = & "$PSScriptRoot\Helpers\ConvertTo-StringBinary.ps1" -Bits $combinedAllowDenySum
     $repoObj | Add-Member -NotePropertyName "AclsCombinedAllowDenySum" -NotePropertyValue "0b$combinedAllowDenySumString"
 
-    AddAclPermissionProperties $gitSecNamespace.actions $combinedAllowDenySum
+    AddAclPermissionProperties -actions $gitSecNamespace.actions -combinedSum $combinedAllowDenySum
 }
 
-function AddAclPermissionProperties($actions, $combinedSum)
+function AddAclPermissionProperties
 {
+    param (
+        [Parameter(Mandatory = $true)]
+        $actions,
+
+        [Parameter(Mandatory = $true)]
+        $combinedSum
+    )
+
     foreach ($action in $actions)
     {
         $actionAllowed = $false
@@ -113,7 +170,7 @@ function AddAclPermissionProperties($actions, $combinedSum)
             $actionAllowed = $true
         }
         $repoObj | Add-Member -NotePropertyName "Acls$($action.name)Allowed" -NotePropertyValue $actionAllowed
-    }    
+    }
 }
 
 
@@ -136,11 +193,11 @@ if ($ProjectName -eq "")
     $projects = & "$PSScriptRoot\Helpers\Call-ApiWithToken.ps1" $requestUrl
     foreach ($project in $projects.Value)
     {
-        GetReposOfProject $OrgName $project.Name $ExcludePermissions $gitSecNamespace
+        GetReposOfProject -orgName $OrgName -projectName $project.Name -excludePermissions $ExcludePermissions -gitSecNamespace $gitSecNamespace
     }
 }
 else
 {
     # Get only repos from specified project
-    GetReposOfProject $OrgName $ProjectName $ExcludePermissions $gitSecNamespace
+    GetReposOfProject -orgName $OrgName -projectName $ProjectName -excludePermissions $ExcludePermissions -gitSecNamespace $gitSecNamespace
 }

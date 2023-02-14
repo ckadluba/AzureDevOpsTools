@@ -2,6 +2,10 @@
 
 A set of PowerShell scripts to accomplish different tasks in Azure DevOps.
 
+## Disclaimer
+
+Some of these scripts make changes to Azure DevOps resources like repositories. They can be helpful and save you some time. But please be aware that, __you are using these scripts at your own risk__. I'm not responsible for any damage done by misuse or by any bugs that might exist in the scripts.
+
 ## Getting Started 
 
 You need one or two things before you can start. :)
@@ -54,7 +58,7 @@ Displays the permissions (access control lists) of a specified repository.
 
 ### Usage
 
-Show permissions (access control lists) set on repository "MyRepo" in project "MyProject" if organisation "myorganisation".
+Show permissions (access control lists) set on repository "MyRepo" in project "MyProject" in organisation "myorganisation".
 
 ```powershell
 .\Show-AdoGitRepoPermissions.ps1 -OrgName "myorganisation" -ProjectName "MyProject" -RepoName "MyRepo"
@@ -73,7 +77,7 @@ Show permissions (access control lists) set on repository "MyRepo" in project "M
 
 * Azure DevOps PAT token permissions: __Code: read__ and __Identity: read__
 
-## RemoveAzureGitRepoWritePermissions
+## Remove-AdoGitRepoWritePermissions
 
 Removes all write permissions from a repository.
 
@@ -105,7 +109,7 @@ PullRequestBypassPolicy
 
 ### Usage
 
-Remove all write permissions from the ACL of the repository "MyRepo" in project "MyProject" if organisation "myorganisation".
+Remove all write permissions from the ACL of the repository "MyRepo" in project "MyProject" in organisation "myorganisation".
 
 ```powershell
 .\Remove-AdoGitRepoWritePermissions.ps1 -OrgName "myorganisation" -ProjectName "MyProject" -RepoName "MyRepo"
@@ -126,23 +130,19 @@ Remove all write permissions from the ACL of the repository "MyRepo" in project 
 
 * Azure DevOps PAT token permissions: __Code: read__, __Identity: read__ and __Security: manage__
 
-### Disclaimer
-
-This script can remove permissions from your repositories. It can be very helpful and save you some time. But please be aware that, __you are using this script at your own risk__. I'm not responsible for any damage done by misuse or by any bugs that might exist in the script.
-
-## GetAdoVariableGroups
+## Get-AdoVariableGroups
 
 Get contents of one or more variable groups.
 
 ### Usage
 
-Get variable group "MyVariableGroup" in project "MyProject" if organisation "myorganisation".
+Get variable group "MyVariableGroup" in project "MyProject" in organisation "myorganisation".
 
 ```powershell
 .\Get-AdoVariableGroups.ps1 -OrgName "myorganisation" -ProjectName "MyProject" -VargroupNames @( "MyVariableGroup" )
 ```
 
-Get variable groups "MyGroup.Dev" and "MyGroup.Prod" in project "MyProject" if organisation "myorganisation" as CSV to file mygroup-vars.csv.
+Get variable groups "MyGroup.Dev" and "MyGroup.Prod" in project "MyProject" in organisation "myorganisation" as CSV to file mygroup-vars.csv.
 
 ```powershell
 .\Get-AdoVariableGroups.ps1 -OrgName "myorganisation" -ProjectName "MyProject" -VargroupNames @( "MyGroup.Dev", "MyGroup.Prod" ) | ConvertTo-Csv > mygroup-vars.csv
@@ -163,13 +163,18 @@ Get variable groups "MyGroup.Dev" and "MyGroup.Prod" in project "MyProject" if o
 
 * Azure DevOps PAT token permission: __Variable Groups: read__
 
-## UpdateAdoVariableGroups
+## Update-AdoVariableGroups
 
 Performs regex replacing in variable values of one or more variable groups.
 
 ### Usage
 
-TO DO
+Replace the string "-legacy" with "-azure" in all variables with names starting with "ServerName" or `HostName" in the variable groups "MyVarGroup.Dev", "MyVarGroup.Test" and "MyVarGroup.Prod" in the project "MyProject" in organisation "myorganisation".
+
+```powershell
+.\Update-AdoVariableGroups.ps1 -OrgName "myorganisation" 
+-ProjectName "MyProject" -VargroupNames @( "MyVarGroup.Dev", "MyVarGroup.Test", "MyVarGroup.Prod" ) -VariableNameExpressions @( "ServerName.*", "HostName.*" ) -ValueMatchExpression "-legacy" -ValueReplaceExpression "-azure"
+```
 
 ### Parameters
 
@@ -177,8 +182,16 @@ TO DO
   The name of the Azure DevOps organisation to use.
 * ProjectName (mandatory)  
   The name of the Azure DevOps project where the variable group is located.
-
-TO DO
+* VargroupNames (mandatory)
+  A list of names of variable groups to process.
+* VariableNameExpressions (optional)
+  A list of regular expressions to select the names of the variables to process. It this is omitted, all variables in the specified groups will be processed.
+* ValueMatchExpression (mandatory)
+  A regular expression to select a matching part of the variable values for replacement.
+* ValueReplaceExpression (mandatory)
+  A regular expression to replace the matched part of the variable values.
+* Confirm (optional)
+  If this is set, the script won't ask the user for confirmation before updating the variables.
 
 ### PAT Permissions
 
