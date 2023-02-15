@@ -182,15 +182,15 @@ Replace the string "-legacy" with "-azure" in all variables with names starting 
   The name of the Azure DevOps organisation to use.
 * ProjectName (mandatory)  
   The name of the Azure DevOps project where the variable group is located.
-* VargroupNames (mandatory)
+* VargroupNames (mandatory)  
   A list of names of variable groups to process.
-* VariableNameExpressions (optional)
+* VariableNameExpressions (optional)  
   A list of regular expressions to select the names of the variables to process. It this is omitted, all variables in the specified groups will be processed.
-* ValueMatchExpression (mandatory)
+* ValueMatchExpression (mandatory)  
   A regular expression to select a matching part of the variable values for replacement.
-* ValueReplaceExpression (mandatory)
+* ValueReplaceExpression (mandatory)  
   A regular expression to replace the matched part of the variable values.
-* Confirm (optional)
+* Confirm (optional)  
   If this is set, the script won't ask the user for confirmation before updating the variables.
 
 ### PAT Permissions
