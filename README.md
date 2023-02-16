@@ -163,7 +163,7 @@ Get variable groups "MyGroup.Dev" and "MyGroup.Prod" in project "MyProject" in o
 
 * Azure DevOps PAT token permission: __Variable Groups: read__
 
-## Update-AdoVariableGroups
+## Update-AdoVariables
 
 Performs regex replacing in variable values of one or more variable groups.
 
@@ -172,7 +172,7 @@ Performs regex replacing in variable values of one or more variable groups.
 Replace the string "-legacy" with "-azure" in all variables with names starting with "ServerName" or `HostName" in the variable groups "MyVarGroup.Dev", "MyVarGroup.Test" and "MyVarGroup.Prod" in the project "MyProject" in organisation "myorganisation".
 
 ```powershell
-.\Update-AdoVariableGroups.ps1 -OrgName "myorganisation" -ProjectName "MyProject" -VargroupNames @( "MyVarGroup.Dev", "MyVarGroup.Test", "MyVarGroup.Prod" ) -VariableNameExpressions @( "ServerName.*", "HostName.*" ) -ValueMatchExpression "-legacy" -ValueReplaceExpression "-azure"
+.\Update-AdoVariables.ps1 -OrgName "myorganisation" -ProjectName "MyProject" -VargroupNames @( "MyVarGroup.Dev", "MyVarGroup.Test", "MyVarGroup.Prod" ) -VariableNameExpressions @( "ServerName.*", "HostName.*" ) -ValueMatchExpression "-legacy" -ValueReplaceExpression "-azure"
 ```
 
 ### Parameters
