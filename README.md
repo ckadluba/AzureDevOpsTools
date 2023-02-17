@@ -21,6 +21,7 @@ You need one or two things before you can start. :)
 1. In Azure DevOps UI create a PAT token in Azure DevOps that has the permissions mentioned below.  
 1. Create the environment variable `AzureDevOpsTools_PAT` containing the PAT token.
 
+
 ## Get-AdoGitRepos
 
 Gets a list of all git repositories within a specified organisation or within a specified project. The output includes information about the last commit and the combined types of permissions set on the repo.
@@ -52,6 +53,7 @@ Get data of all git repos in all projects of organisation "myorganisation" and w
 
 * Azure DevOps PAT token permission: __Code: read__
 
+
 ## Show-AdoGitRepoPermissions
 
 Displays the permissions (access control lists) of a specified repository.
@@ -76,6 +78,7 @@ Show permissions (access control lists) set on repository "MyRepo" in project "M
 ### PAT Permissions
 
 * Azure DevOps PAT token permissions: __Code: read__ and __Identity: read__
+
 
 ## Remove-AdoGitRepoWritePermissions
 
@@ -130,6 +133,7 @@ Remove all write permissions from the ACL of the repository "MyRepo" in project 
 
 * Azure DevOps PAT token permissions: __Code: read__, __Identity: read__ and __Security: manage__
 
+
 ## Get-AdoVariableGroups
 
 Get contents of one or more variable groups.
@@ -163,6 +167,38 @@ Get variable groups "MyGroup.Dev" and "MyGroup.Prod" in project "MyProject" in o
 
 * Azure DevOps PAT token permission: __Variable Groups: read__
 
+
+## Show-AdoVariables
+
+Searches and displays variables according to specified name and value search patterns from one or more variable groups.
+
+### Usage
+
+Find and display all variables containing the string "-legacy" in all variables with names starting with "ServerName" or `HostName" in the variable groups "MyVarGroup.Dev", "MyVarGroup.Test" and "MyVarGroup.Prod" in the project "MyProject" in organisation "myorganisation".
+
+```powershell
+.\Update-AdoVariables.ps1 -OrgName "myorganisation" -ProjectName "MyProject" -VargroupNames @( "MyVarGroup.Dev", "MyVarGroup.Test", "MyVarGroup.Prod" ) -VariableNameExpressions @( "ServerName.*", "HostName.*" ) -ValueMatchExpression "-legacy"
+
+```
+
+### Parameters
+
+* OrgName (mandatory)  
+  The name of the Azure DevOps organisation to use.
+* ProjectName (mandatory)  
+  The name of the Azure DevOps project where the variable group is located.
+* VargroupNames (mandatory)  
+  A list of names of variable groups to process.
+* VariableNameExpressions (optional)  
+  A list of regular expressions to select the names of the variables to process. It this is omitted, all variables in the specified groups will be processed.
+* ValueMatchExpression (optional)  
+  A regular expression to select variables by their value.
+
+### PAT Permissions
+
+* Azure DevOps PAT token permission: __Project and Team: read__ and __Variable Groups: read__
+
+
 ## Update-AdoVariables
 
 Performs regex replacing in variable values of one or more variable groups.
@@ -194,4 +230,4 @@ Replace the string "-legacy" with "-azure" in all variables with names starting 
 
 ### PAT Permissions
 
-* Azure DevOps PAT token permission: __Project and Team: read__ and  __Variable Groups: read, create, & manage__
+* Azure DevOps PAT token permission: __Project and Team: read__ and __Variable Groups: read, create, & manage__

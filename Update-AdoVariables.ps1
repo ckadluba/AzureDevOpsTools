@@ -29,40 +29,14 @@ param (
     $Confirm
 )
 
-function GetProjectIdByName
-{
-    param (
-        [Parameter(Mandatory = $true)]
-        [string]
-        $orgName,
-
-        [Parameter(Mandatory = $true)]
-        [string]
-        $projectName
-    )
-
-    $projects = & "$PSScriptRoot\Helpers\Call-ApiWithToken.ps1" -Url "https://dev.azure.com/$orgName/_apis/projects?api-version=7.0"
-    $project = $projects.value | Where-Object { $_.name -eq $projectName }
-    $project.id
-}
-
 function CreateChanges
 {
     param (
         [Parameter(Mandatory = $true)]
-        [string]
-        $projectName,
+        $fullVargroups,
 
         [Parameter(Mandatory = $true)]
-        [string]
-        $projectId,
-
-        [Parameter(Mandatory = $true)]
-        $oldVargroups,
-
-        [Parameter()]
-        [string[]]
-        $nameExpressions,
+        $matchingVargroups,
 
         [Parameter(Mandatory = $true)]
         [string]
@@ -73,34 +47,19 @@ function CreateChanges
         $replaceExpression
     )
 
-    $changeResult = @{
-        "changesFound" = $false
-        "newVargroups" = New-Object -TypeName Collections.Generic.List[PSObject]
-    }
-    foreach ($oldVargroup in $oldVargroups)
+    foreach ($vargroup in $fullVargroups)
     {
-        $newVargroup = New-Object -TypeName PSObject
-        $newVargroup | Add-Member -NotePropertyName "id" -NotePropertyValue $oldVargroup.id
-        $newVargroup | Add-Member -NotePropertyName "name" -NotePropertyValue $oldVargroup.name
-
-        $newVariables = New-Object -TypeName PSObject
-        foreach ($variable in $oldVargroup.variables.PSObject.Properties)
+        $matchingVargroup = $matchingVargroups | Where-Object -Property name -eq $vargroup.name
+        if ($null -eq $matchingVargroup)
         {
-            # By default keep existing value
-            $newValue = $variable.Value.value
+            continue
+        }
 
-            if (-not (IsNameMatching -name $variable.name -matchExpressions $nameExpressions))
+        foreach ($variable in $vargroup.variables.PSObject.Properties)
+        {
+            $matchingVariable = $matchingVargroup.variables.PSObject.Properties | Where-Object { $_.Name -eq $variable.Name }
+            if ($null -eq $matchingVariable)
             {
-                continue
-            }
-            if ($variable.value.isSecret)
-            {
-                Write-Warning "Cannot change value of secret variable $($variable.Name) in group $($oldVargroup.name)"
-                continue
-            }
-            if ($variable.value.isHidden)
-            {
-                Write-Warning "Cannot change value of hidden variable $($variable.Name) in group $($oldVargroup.name)"
                 continue
             }
 
@@ -108,56 +67,11 @@ function CreateChanges
             $newValue = $variable.Value.value -replace $matchExpression, $replaceExpression
             if ($newValue -ne $variable.Value.value)
             {
-                Write-Host "Group: $($oldVargroup.name), variable: $($variable.Name), current value: $($variable.Value.value), new value: $($newValue)"
-                $changeResult.changesFound = $true
+                Write-Host "Group: $($vargroup.name), variable: $($variable.Name), current value: $($variable.Value.value), new value: $($newValue)"
+                $variable.Value.value = $newValue
             }
-
-            $newVariables | Add-Member -NotePropertyName $variable.name -NotePropertyValue $newValue
-        }
-        $newVargroup | Add-Member -NotePropertyName "variables" -NotePropertyValue $newVariables
-
-        $newVargroupProjectReference = New-Object -TypeName PSObject
-        $newVargroupProjectReference | Add-Member -NotePropertyName "name" -NotePropertyValue $oldVargroup.name
-        $newVargroupProjectReference | Add-Member -NotePropertyName "description" -NotePropertyValue $oldVargroup.description
-
-        $newProjectReference = New-Object -TypeName PSObject
-        $newProjectReference | Add-Member -NotePropertyName "name" -NotePropertyValue $projectName
-        $newProjectReference | Add-Member -NotePropertyName "id" -NotePropertyValue $projectId
-        $newVargroupProjectReference | Add-Member -NotePropertyName "projectReference" -NotePropertyValue $newProjectReference
-        $newVargroup | Add-Member -NotePropertyName "variableGroupProjectReferences" -NotePropertyValue @( $newVargroupProjectReference )
-
-        $changeResult.newVargroups.Add($newVargroup) | Out-Null
-    }
-
-    $changeResult
-}
-
-function IsNameMatching
-{
-    param (
-        [Parameter(Mandatory = $true)]
-        [string]
-        $name,
-
-        [Parameter()]
-        [string[]]
-        $matchExpressions
-    )
-
-    if (($null -eq $matchExpressions) -or ($matchExpressions.Count -eq 0))
-    {
-        return $true
-    }
-
-    foreach ($expression in $matchExpressions)
-    {
-        if ($name -match $expression)
-        {
-            return $true
         }
     }
-
-    return $false
 }
 
 function UpdateVariableGroups
@@ -185,29 +99,26 @@ function UpdateVariableGroups
 
 # Begin of main script
 
-$projectId = GetProjectIdByName -orgName $OrgName -projectName $ProjectName
-if ($null -eq $projectId)
-{
-    Write-Error "Project $ProjectName in org $OrgName not found!"
-    exit 1
-}
-
 Write-Host "Updating variables in org: $OrgName, project: $ProjectName"
-$oldVargroups = & "$PSScriptRoot\Get-AdoVariableGroups.ps1" -OrgName $OrgName -ProjectName $ProjectName -VargroupNames $VargroupNames -Raw
-if ($null -eq $oldVargroups)
+$vargroups = & "$PSScriptRoot\Get-AdoVariableGroups.ps1" -OrgName $OrgName -ProjectName $ProjectName -VargroupNames $VargroupNames -Raw
+if ($null -eq $vargroups)
 {
     Write-Error "Specified variable groups not found in org: $OrgName, project $ProjectName!"
     exit 2
 }
 Write-Host ""
 
-Write-Host "Creating list of changes"
-$changes = CreateChanges -projectName $ProjectName -projectId $projectId -oldVargroups $oldVargroups -nameExpressions $VariableNameExpressions -matchExpression $ValueMatchExpression -replaceExpression $ValueReplaceExpression
-if (-not $changes.changesFound)
+$matchingVargroups = & "$PSScriptRoot\Helpers\Get-AdoVariablesFromObjects.ps1" -Vargroups $vargroups -NameExpressions $VariableNameExpressions -ValueExpression $ValueMatchExpression
+if ($matchingVargroups.Count -eq 0)
 {
-    Write-Host "No changes to be made"
-    exit 3
+    Write-Host "No matching variables found"
+    exit 0
 }
+
+$fullVargroups = & "$PSScriptRoot\Helpers\Get-AdoVariablesFromObjects.ps1" -Vargroups $vargroups
+
+Write-Host "List of changes"
+CreateChanges -fullVargroups $fullVargroups -matchingVargroups $matchingVargroups -matchExpression $ValueMatchExpression -replaceExpression $ValueReplaceExpression
 Write-Host ""
 
 if (-not $Confirm.IsPresent)
@@ -217,8 +128,8 @@ if (-not $Confirm.IsPresent)
     {
         exit 0
     }
+    Write-Host ""
 }
-Write-Host ""
 
 Write-Host "Updating variables"
-UpdateVariableGroups -orgName $OrgName -projectName $ProjectName -newVargroups $changes.newVargroups
+UpdateVariableGroups -orgName $OrgName -projectName $ProjectName -newVargroups $fullVargroups

@@ -40,8 +40,35 @@ function GetFlatVargroupObject
     $vargroupFlatObj
 }
 
+function GetProjectIdByName
+{
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]
+        $orgName,
+
+        [Parameter(Mandatory = $true)]
+        [string]
+        $projectName
+    )
+
+    $projects = & "$PSScriptRoot\Helpers\Call-ApiWithToken.ps1" -Url "https://dev.azure.com/$orgName/_apis/projects?api-version=7.0"
+    $project = $projects.value | Where-Object { $_.name -eq $projectName }
+    $project.id
+}
+
 
 # Begin of main script
+
+if ($Raw.IsPresent)
+{
+    $projectId = GetProjectIdByName -orgName $OrgName -projectName $ProjectName
+    if ($null -eq $projectId)
+    {
+        Write-Error "Project $ProjectName in org $OrgName not found!"
+        exit 1
+    }    
+}
 
 foreach ($vargroupName in $VargroupNames)
 {
@@ -61,6 +88,16 @@ foreach ($vargroupName in $VargroupNames)
             }
             else
             {
+                # Project reference is used by Update-AdoVariables.ps1
+                $matchedVargroupProjectReference = New-Object -TypeName PSObject
+                $matchedVargroupProjectReference | Add-Member -NotePropertyName "name" -NotePropertyValue $vargroupRaw.name
+                $matchedVargroupProjectReference | Add-Member -NotePropertyName "description" -NotePropertyValue $vargroupRaw.description
+                $matchedProjectReference = New-Object -TypeName PSObject
+                $matchedProjectReference | Add-Member -NotePropertyName "name" -NotePropertyValue $ProjectName
+                $matchedProjectReference | Add-Member -NotePropertyName "id" -NotePropertyValue $projectId        
+                $matchedVargroupProjectReference | Add-Member -NotePropertyName "projectReference" -NotePropertyValue $matchedProjectReference
+                $vargroupRaw.variableGroupProjectReferences = @( $matchedVargroupProjectReference )
+        
                 $vargroupRaw
             }
         }
