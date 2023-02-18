@@ -2,7 +2,7 @@
 param (
     [Parameter(Mandatory = $true)]
     [string]
-    $OrgName = $null,
+    $OrgName,
 
     [Parameter(Mandatory = $false)]
     [string]
@@ -27,7 +27,7 @@ function GetReposOfProject
         [Parameter(Mandatory = $true)]
         $excludePermissions,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $false)]
         $gitSecNamespace
     )
 
