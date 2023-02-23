@@ -1,10 +1,6 @@
-# AzureDevOpsTools
+# SystemTeamTools PowerShell Module
 
 A set of PowerShell scripts to accomplish different tasks in Azure DevOps.
-
-## Disclaimer
-
-Some of these scripts make changes to Azure DevOps resources like repositories. They can be helpful and save you some time. But please be aware that, __you are using these scripts at your own risk__. I'm not responsible for any damage done by misuse or by any bugs that might exist in the scripts.
 
 ## Getting Started 
 
@@ -13,13 +9,38 @@ You need one or two things before you can start. :)
 ### Prerequisites
 
 * PowerShell 7
-* Azure DevOps organisation with one or more git repositories
+* Az PowerShell Module 4.7 or higher (https://docs.microsoft.com/en-us/powershell/azure/install-az-ps?view=azps-4.7.0)
 * Azure DevOps PAT token (see individual prerequisites of each script below for necessary permissions)
 
 ### Setting the PAT token
 
 1. In Azure DevOps UI create a PAT token in Azure DevOps that has the permissions mentioned below.  
 1. Create the environment variable `AzureDevOpsTools_PAT` containing the PAT token.
+
+
+## Get-TemplateParameters 
+
+Gets the latests URL and SAS Token for the Base Templates (IaC_Templates). Use the currently checked-out branch when calling it from a git working copy of IaC_Templates or from a branch speficied.
+
+
+## Test-PipelineYamlFile
+
+Uses the Azure DevOps API to validate a single pipeline YAML file.
+
+
+## Test-PipelineYamlTree
+
+Uses the Azure DevOps API to validate local YAML changes based on an existing Azure Git repo and pipeline. 
+
+
+## Get-PipelineTransition
+
+Gets a list of pipelines which are not using the central build pools. 
+
+
+## Set-PipelineTransitionCsv
+
+Like Get-PipelineTransition but writes CSV result. 
 
 
 ## Get-AdoGitRepos
