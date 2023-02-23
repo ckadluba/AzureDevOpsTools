@@ -1,4 +1,4 @@
-# SystemTeamTools PowerShell Module
+# AzureDevOpsTools
 
 A set of PowerShell scripts to accomplish different tasks in Azure DevOps.
 
