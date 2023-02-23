@@ -1,13 +1,13 @@
 [CmdletBinding()]
 param (
-    [Parameter(Mandatory = $true)]
+    [Parameter(Mandatory)]
     $Vargroups,
 
     [Parameter()]
     [string[]]
     $NameExpressions,
 
-    [Parameter(Mandatory = $false)]
+    [Parameter()]
     [string]
     $ValueExpression
 )
@@ -15,7 +15,7 @@ param (
 function IsNameMatching
 {
     param (
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory)]
         [string]
         $name,
 

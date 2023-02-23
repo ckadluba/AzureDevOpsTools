@@ -1,30 +1,30 @@
 [CmdletBinding()]
 param (
-    [Parameter(Mandatory = $true)]
+    [Parameter(Mandatory)]
     [string]
     $OrgName,
 
-    [Parameter(Mandatory = $true)]
+    [Parameter(Mandatory)]
     [string]
     $ProjectName,
 
-    [Parameter(Mandatory = $true)]
+    [Parameter(Mandatory)]
     [string[]]
     $VargroupNames,
 
-    [Parameter(Mandatory = $false)]
+    [Parameter()]
     [string[]]
     $VariableNameExpressions,
 
-    [Parameter(Mandatory = $true)]
+    [Parameter(Mandatory)]
     [string]
     $ValueMatchExpression,
 
-    [Parameter(Mandatory = $true)]
+    [Parameter(Mandatory)]
     [string]
     $ValueReplaceExpression,
 
-    [Parameter(Mandatory = $false)]
+    [Parameter()]
     [switch]
     $Confirm
 )
@@ -32,17 +32,17 @@ param (
 function CreateChanges
 {
     param (
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory)]
         $fullVargroups,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory)]
         $matchingVargroups,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory)]
         [string]
         $matchExpression,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory)]
         [string]
         $replaceExpression
     )
@@ -77,15 +77,15 @@ function CreateChanges
 function UpdateVariableGroups
 {
     param (
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory)]
         [string]
         $orgName,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory)]
         [string]
         $projectName,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory)]
         $newVargroups
     )
 

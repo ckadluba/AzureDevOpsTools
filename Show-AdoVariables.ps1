@@ -1,22 +1,22 @@
 [CmdletBinding()]
 param (
-    [Parameter(Mandatory = $true)]
+    [Parameter(Mandatory)]
     [string]
     $OrgName,
 
-    [Parameter(Mandatory = $true)]
+    [Parameter(Mandatory)]
     [string]
     $ProjectName,
 
-    [Parameter(Mandatory = $true)]
+    [Parameter(Mandatory)]
     [string[]]
     $VargroupNames,
 
-    [Parameter(Mandatory = $false)]
+    [Parameter()]
     [string[]]
     $VariableNameExpressions,
 
-    [Parameter(Mandatory = $false)]
+    [Parameter()]
     [string]
     $ValueMatchExpression
 )
@@ -24,7 +24,7 @@ param (
 function ShowMatchedVariables
 {
     param (
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory)]
         $vargroups
     )
 

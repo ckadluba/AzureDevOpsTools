@@ -1,14 +1,14 @@
 [CmdletBinding()]
 param (
-    [Parameter(Mandatory = $true)]
+    [Parameter(Mandatory)]
     [string]
     $OrgName,
 
-    [Parameter(Mandatory = $true)]
+    [Parameter(Mandatory)]
     [string]
     $ProjectName,
 
-    [Parameter(Mandatory = $true)]
+    [Parameter(Mandatory)]
     [string]
     $RepoName
 )

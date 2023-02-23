@@ -1,18 +1,18 @@
 [CmdletBinding()]
 param (
-    [Parameter(Mandatory = $true)]
+    [Parameter(Mandatory)]
     [string]
     $OrgName,
 
-    [Parameter(Mandatory = $true)]
+    [Parameter(Mandatory)]
     [string]
     $ProjectName,
 
-    [Parameter(Mandatory = $true)]
+    [Parameter(Mandatory)]
     [string[]]
     $VargroupNames,
 
-    [Parameter(Mandatory = $false)]
+    [Parameter()]
     [switch]
     $Raw
 )
@@ -20,7 +20,7 @@ param (
 function GetFlatVargroupObject
 {
     param (
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory)]
         $vargroup
     )
 
@@ -43,11 +43,11 @@ function GetFlatVargroupObject
 function GetProjectIdByName
 {
     param (
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory)]
         [string]
         $orgName,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory)]
         [string]
         $projectName
     )
@@ -72,7 +72,7 @@ if ($Raw.IsPresent)
 
 foreach ($vargroupName in $VargroupNames)
 {
-    Write-Host "Getting variable group $vargroupName in org $orgName, project $projectName"
+    Write-Debug "Getting variable group $vargroupName in org $orgName, project $projectName"
 
     $requestUrl = "https://dev.azure.com/$OrgName/$ProjectName/_apis/distributedtask/variablegroups?groupName=$($vargroupName)&api-version=7.1-preview.2"
     $vargroupsResponse = & "$PSScriptRoot\Helpers\Call-ApiWithToken.ps1" -Url $requestUrl

@@ -1,14 +1,14 @@
 [CmdletBinding()]
 param (
-    [Parameter(Mandatory = $true)]
+    [Parameter(Mandatory)]
     [string]
     $OrgName,
 
-    [Parameter(Mandatory = $false)]
+    [Parameter()]
     [string]
     $ProjectName = "",
 
-    [Parameter(Mandatory = $false)]
+    [Parameter()]
     [switch]
     $ExcludePermissions
 )
@@ -16,29 +16,29 @@ param (
 function GetReposOfProject
 {
     param (
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory)]
         [string]
         $orgName,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory)]
         [string]
         $projectName,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory)]
         $excludePermissions,
 
-        [Parameter(Mandatory = $false)]
+        [Parameter()]
         $gitSecNamespace
     )
 
-    Write-Host "Checking repos for org: $orgName, project: $projectName"
+    Write-Debug "Checking repos for org: $orgName, project: $projectName"
 
     $requestUrl = "https://dev.azure.com/$orgName/$projectName/_apis/git/repositories?includeLinks=true&includeAllUrls=true&includeHidden=true&api-version=7.0"
     $repos = & "$PSScriptRoot\Helpers\Call-ApiWithToken.ps1" -Url $requestUrl
 
     foreach ($repo in $repos.value)
     {
-        Write-Host "Checking repo $($repo.name)"
+        Write-Debug "Checking repo $($repo.name)"
 
         # Create return object with basic repo info
         $repoObj = New-Object -TypeName PSObject
@@ -54,12 +54,12 @@ function GetReposOfProject
         }
         else
         {
-            Write-Host "Getting last commit"
+            Write-Debug "Getting last commit"
             AddLastCommitInfo -orgName $orgName -projectName $projectName -gitRepoId $gitRepoId -repoObj $repoObj
 
             if (-not $excludePermissions.IsPresent)
             {
-                Write-Host "Getting permissions"
+                Write-Debug "Getting permissions"
                 AddPermissionsInfo -orgName $orgName -gitSecNamespace $gitSecNamespace -gitRepoId $gitRepoId -repoObj $repoObj
             }
         }
@@ -76,19 +76,19 @@ function GetReposOfProject
 function AddLastCommitInfo
 {
     param (
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory)]
         [string]
         $orgName,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory)]
         [string]
         $projectName,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory)]
         [string]
         $gitRepoId,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory)]
         $repoObj
     )
 
@@ -117,18 +117,18 @@ function AddLastCommitInfo
 function AddPermissionsInfo
 {
     param (
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory)]
         [string]
         $orgName,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory)]
         $gitSecNamespace,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory)]
         [string]
         $gitRepoId,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory)]
         $repoObj
     )
 
@@ -155,10 +155,10 @@ function AddPermissionsInfo
 function AddAclPermissionProperties
 {
     param (
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory)]
         $actions,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory)]
         $combinedSum
     )
 

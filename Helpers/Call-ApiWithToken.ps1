@@ -1,14 +1,14 @@
 [CmdletBinding()]
 param (
-    [Parameter(Mandatory = $true)]
+    [Parameter(Mandatory)]
     [string]
     $Url,
 
-    [Parameter(Mandatory = $false)]
+    [Parameter()]
     [string]
     $Method = "GET",
 
-    [Parameter(Mandatory = $false)]
+    [Parameter()]
     [System.Management.Automation.PSObject]
     $Body = $null
 )

@@ -1,18 +1,18 @@
 [CmdletBinding()]
 param (
-    [Parameter(Mandatory = $true)]
+    [Parameter(Mandatory)]
     [string]
     $OrgName,
 
-    [Parameter(Mandatory = $true)]
+    [Parameter(Mandatory)]
     [string]
     $ProjectName,
 
-    [Parameter(Mandatory = $true)]
+    [Parameter(Mandatory)]
     [string]
     $RepoName,
 
-    [Parameter(Mandatory = $false)]
+    [Parameter()]
     [switch]
     $Confirm
 )
@@ -42,13 +42,13 @@ function RemoveWritePermissionsFromAcls($acls, $gitSecActions)
 function RemovePermissionFromAce
 {
     param (
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory)]
         $inputAce,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory)]
         $removeActionNames,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory)]
         $actions
     )
 
@@ -64,13 +64,13 @@ function RemovePermissionFromAce
 function SetGitRepoAcls
 {
     param (
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory)]
         $orgName,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory)]
         $securityNamespaceId,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory)]
         $acls
     )
 
@@ -83,13 +83,13 @@ function SetGitRepoAcls
 function SetGitRepoAcl
 {
     param (
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory)]
         $orgName,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory)]
         $securityNamespaceId,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory)]
         $acl
     )
 

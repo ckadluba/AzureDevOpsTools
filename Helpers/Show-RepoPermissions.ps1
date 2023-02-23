@@ -1,33 +1,33 @@
 [CmdletBinding()]
 param (
-    [Parameter(Mandatory = $true)]
+    [Parameter(Mandatory)]
     [string]
     $OrgName,
 
-    [Parameter(Mandatory = $true)]
+    [Parameter(Mandatory)]
     $GitSecNamespace,
 
-    [Parameter(Mandatory = $true)]
+    [Parameter(Mandatory)]
     $Acls,
 
-    [Parameter(Mandatory = $false)]
+    [Parameter()]
     $IdentitiesCache = @{}
 )
 
 function DisplayGitRepoAcls
 {
     param (
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory)]
         [string]
         $orgName,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory)]
         $acls,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory)]
         $gitSecActions,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory)]
         $identitiesCache
     )
 
@@ -52,15 +52,15 @@ function DisplayGitRepoAcls
 function GetIdentityName
 {
     param (
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory)]
         [string]
         $orgName,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory)]
         [string]
         $descriptor,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory)]
         $identitiesCache
     )
 
@@ -79,10 +79,10 @@ function GetIdentityName
 function RenderPermissionsValue
 {
     param (
-        [Parameter(Mandatory = $false)]
+        [Parameter()]
         $bits,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory)]
         $actions
     )
 
