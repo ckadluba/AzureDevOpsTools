@@ -78,36 +78,40 @@ if ($Raw.IsPresent)
     }    
 }
 
-foreach ($vargroupName in $VargroupNames)
+Write-Debug "Getting variable groups in org $orgName, project $projectName"
+
+# $requestUrl = "$ServerUrl/$OrgName/$ProjectName/_apis/distributedtask/variablegroups?groupName=$($vargroupName)&api-version=7.1-preview.2"
+$requestUrl = "$ServerUrl/$OrgName/$ProjectName/_apis/distributedtask/variablegroups?api-version=7.1-preview.2"
+$vargroupsResponse = & "$PSScriptRoot\Helpers\Call-ApiWithToken.ps1" -Url $requestUrl
+
+if (($null -ne $vargroupsResponse) -and ($vargroupsResponse.Count -gt 0))
 {
-    Write-Debug "Getting variable group $vargroupName in org $orgName, project $projectName"
 
-    $requestUrl = "$ServerUrl/$OrgName/$ProjectName/_apis/distributedtask/variablegroups?groupName=$($vargroupName)&api-version=7.1-preview.2"
-    $vargroupsResponse = & "$PSScriptRoot\Helpers\Call-ApiWithToken.ps1" -Url $requestUrl
-
-    if (($null -ne $vargroupsResponse) -and ($vargroupsResponse.Count -eq 1))
+    foreach ($vargroupRaw in $vargroupsResponse.value)
     {
-
-        foreach ($vargroupRaw in $vargroupsResponse.value)
+        if (-not ($VargroupNames[0] -contains "*") -and -not ($vargroupRaw.name -in $VargroupNames))
         {
-            if (-not $Raw.IsPresent)
-            {
-                GetFlatVargroupObject -vargroup $vargroupRaw
-            }
-            else
-            {
-                # Project reference is used by Update-AdoVariables.ps1
-                $matchedVargroupProjectReference = New-Object -TypeName PSObject
-                $matchedVargroupProjectReference | Add-Member -NotePropertyName "name" -NotePropertyValue $vargroupRaw.name
-                $matchedVargroupProjectReference | Add-Member -NotePropertyName "description" -NotePropertyValue $vargroupRaw.description
-                $matchedProjectReference = New-Object -TypeName PSObject
-                $matchedProjectReference | Add-Member -NotePropertyName "name" -NotePropertyValue $ProjectName
-                $matchedProjectReference | Add-Member -NotePropertyName "id" -NotePropertyValue $projectId        
-                $matchedVargroupProjectReference | Add-Member -NotePropertyName "projectReference" -NotePropertyValue $matchedProjectReference
-                $vargroupRaw.variableGroupProjectReferences = @( $matchedVargroupProjectReference )
-        
-                $vargroupRaw
-            }
+            # Skip if vargroup is not in filter parameter
+            continue
+        }
+
+        if (-not $Raw.IsPresent)
+        {
+            GetFlatVargroupObject -vargroup $vargroupRaw
+        }
+        else
+        {
+            # Project reference is used by Update-AdoVariables.ps1
+            $matchedVargroupProjectReference = New-Object -TypeName PSObject
+            $matchedVargroupProjectReference | Add-Member -NotePropertyName "name" -NotePropertyValue $vargroupRaw.name
+            $matchedVargroupProjectReference | Add-Member -NotePropertyName "description" -NotePropertyValue $vargroupRaw.description
+            $matchedProjectReference = New-Object -TypeName PSObject
+            $matchedProjectReference | Add-Member -NotePropertyName "name" -NotePropertyValue $ProjectName
+            $matchedProjectReference | Add-Member -NotePropertyName "id" -NotePropertyValue $projectId        
+            $matchedVargroupProjectReference | Add-Member -NotePropertyName "projectReference" -NotePropertyValue $matchedProjectReference
+            $vargroupRaw.variableGroupProjectReferences = @( $matchedVargroupProjectReference )
+    
+            $vargroupRaw
         }
     }
 }

@@ -177,6 +177,12 @@ Get variable groups "MyGroup.Dev" and "MyGroup.Prod" in project "MyProject" in o
 .\Get-AdoVariableGroups.ps1 -ServerUrl "https://myazdourl" -OrgName "myorganisation" -ProjectName "MyProject" -VargroupNames @( "MyGroup.Dev", "MyGroup.Prod" ) | ConvertTo-Csv > mygroup-vars.csv
 ```
 
+Get all variable groups in project "MyProject" in organisation "myorganisation" as CSV to file mygroup-vars.csv.
+
+```powershell
+.\Get-AdoVariableGroups.ps1 -ServerUrl "https://myazdourl" -OrgName "myorganisation" -ProjectName "MyProject" -VargroupNames @( "*" ) | ConvertTo-Csv > mygroup-vars.csv
+```
+
 ### Parameters
 
 * ServerUrl (optional)  
@@ -186,7 +192,7 @@ Get variable groups "MyGroup.Dev" and "MyGroup.Prod" in project "MyProject" in o
 * ProjectName (mandatory)  
   The name of the Azure DevOps project where the variable group is located.
 * VargroupNames (mandatory)  
-  The names of the variable groups.
+  The names of the variable groups. Use `@("*")` to match all.
 * Raw (optional)  
   If this is set, the script will return raw objects instead of flattened key-value collections. This is suitable to keep all information returned by the API for subsequent processing.
 
@@ -217,7 +223,7 @@ Find and display all variables containing the string "-legacy" in all variables 
 * ProjectName (mandatory)  
   The name of the Azure DevOps project where the variable group is located.
 * VargroupNames (mandatory)  
-  A list of names of variable groups to process.
+  A list of names of variable groups to process. Use `@("*")` to match all.
 * VariableNameExpressions (optional)  
   A list of regular expressions to select the names of the variables to process. It this is omitted, all variables in the specified groups will be processed.
 * ValueMatchExpression (optional)  
@@ -240,6 +246,12 @@ Search the string "-legacy" in all variables with names starting with "ServerNam
 .\Show-AdoVariables.ps1 -ServerUrl "https://myazdourl" -OrgName "myorganisation" -ProjectName "MyProject" -VargroupNames @( "MyVarGroup.Dev", "MyVarGroup.Test", "MyVarGroup.Prod" ) -VariableNameExpressions @( "ServerName.*", "HostName.*" ) -ValueMatchExpression "-legacy"
 ```
 
+Search the string "-legacy" in all variables with names starting with "ServerName" or `HostName" in all variable groups in the project "MyProject" in organisation "myorganisation".
+
+```powershell
+.\Show-AdoVariables.ps1 -ServerUrl "https://myazdourl" -OrgName "myorganisation" -ProjectName "MyProject" -VargroupNames @( "*" ) -VariableNameExpressions @( "ServerName.*", "HostName.*" ) -ValueMatchExpression "-legacy"
+```
+
 ### Parameters
 
 * ServerUrl (optional)  
@@ -249,7 +261,7 @@ Search the string "-legacy" in all variables with names starting with "ServerNam
 * ProjectName (mandatory)  
   The name of the Azure DevOps project where the variable group is located.
 * VargroupNames (mandatory)  
-  A list of names of variable groups to process.
+  A list of names of variable groups to process. Use `@("*")` to match all.
 * VariableNameExpressions (optional)  
   A list of regular expressions to select the names of the variables to process. It this is omitted, all variables in the specified groups will be processed.
 
@@ -270,6 +282,12 @@ Replace the string "-legacy" with "-azure" in all variables with names starting 
 .\Update-AdoVariables.ps1 -ServerUrl "https://myazdourl" -OrgName "myorganisation" -ProjectName "MyProject" -VargroupNames @( "MyVarGroup.Dev", "MyVarGroup.Test", "MyVarGroup.Prod" ) -VariableNameExpressions @( "ServerName.*", "HostName.*" ) -ValueMatchExpression "-legacy" -ValueReplaceExpression "-azure"
 ```
 
+Replace the string "-legacy" with "-azure" in all variables with names starting with "ServerName" or `HostName" in all variable groups in the project "MyProject" in organisation "myorganisation".
+
+```powershell
+.\Update-AdoVariables.ps1 -ServerUrl "https://myazdourl" -OrgName "myorganisation" -ProjectName "MyProject" -VargroupNames @( "*" ) -VariableNameExpressions @( "ServerName.*", "HostName.*" ) -ValueMatchExpression "-legacy" -ValueReplaceExpression "-azure"
+```
+
 ### Parameters
 
 * ServerUrl (optional)  
@@ -279,7 +297,7 @@ Replace the string "-legacy" with "-azure" in all variables with names starting 
 * ProjectName (mandatory)  
   The name of the Azure DevOps project where the variable group is located.
 * VargroupNames (mandatory)  
-  A list of names of variable groups to process.
+  A list of names of variable groups to process. Use `@("*")` to match all.
 * VariableNameExpressions (optional)  
   A list of regular expressions to select the names of the variables to process. It this is omitted, all variables in the specified groups will be processed.
 * ValueMatchExpression (mandatory)  
