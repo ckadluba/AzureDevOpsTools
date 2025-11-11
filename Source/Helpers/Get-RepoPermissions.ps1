@@ -2,6 +2,10 @@
 param (
     [Parameter(Mandatory)]
     [string]
+    $ServerUrl,
+
+    [Parameter(Mandatory)]
+    [string]
     $OrgName,
 
     [Parameter(Mandatory)]
@@ -17,7 +21,7 @@ param (
 
 $acls = $null
 
-$requestUrl = "https://dev.azure.com/$OrgName/_apis/accesscontrollists/$($GitSecNamespace.namespaceId)?includeExtendedInfo=True&api-version=6.0"
+$requestUrl = "$ServerUrl/$OrgName/_apis/accesscontrollists/$($GitSecNamespace.namespaceId)?includeExtendedInfo=True&api-version=6.0"
 $allRepoAclsResponse = $null
 $allRepoAclsResponse = & "$PSScriptRoot\Call-ApiWithToken.ps1" -Url $requestUrl
 $allRepoAcls = $allRepoAclsResponse.value

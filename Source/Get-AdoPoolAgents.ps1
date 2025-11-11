@@ -2,6 +2,10 @@
 param (
     [Parameter(Mandatory)]
     [string]
+    $ServerUrl,
+
+    [Parameter(Mandatory)]
+    [string]
     $OrgName,
 
     [Parameter(Mandatory)]
@@ -12,7 +16,7 @@ param (
 
 # Begin of main script
 
-$requestUrl = "https://dev.azure.com/$OrgName/_apis/distributedtask/elasticpools?api-version=7.1-preview.1"
+$requestUrl = "$ServerUrl/$OrgName/_apis/distributedtask/elasticpools?api-version=7.1-preview.1"
 $queuesResponse = & "$PSScriptRoot\Helpers\Call-ApiWithToken.ps1" -Url $requestUrl
 if ($queuesResponse.Count -eq 0)
 {
@@ -28,7 +32,7 @@ if ($null -eq $poolQueue)
 }
 
 # Get agents
-$requestUrl = "https://dev.azure.com/$OrgName/_apis/distributedtask/pools/$($poolQueue.PoolId)/agents?api-version=7.0"
+$requestUrl = "$ServerUrl/$OrgName/_apis/distributedtask/pools/$($poolQueue.PoolId)/agents?api-version=7.0"
 $agentsResponse = & "$PSScriptRoot\Helpers\Call-ApiWithToken.ps1" -Url $requestUrl
 if ($agentsResponse.Count -eq 0)
 {

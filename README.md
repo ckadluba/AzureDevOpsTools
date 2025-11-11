@@ -16,7 +16,7 @@ You need one or two things before you can start. :)
 
 1. In Azure DevOps UI create a PAT token in Azure DevOps that has the permissions mentioned below.  
 1. Create the environment variable `AzureDevOpsTools_PAT` containing the PAT token.
-
+1. You can create fruther variables used by most of the cmdlets. This is optional because these values can also passed as parameters to every cmdlet. Those variables are: `AzureDevOpsTools_ServerUrl`, `AzureDevOpsTools_OrgName` and `AzureDevOpsTools_Project`-
 
 ## Get-TemplateParameters 
 
@@ -52,19 +52,19 @@ Gets a list of all git repositories within a specified organisation or within a 
 Get data of all git repos in organisation "myorganisation" and project "MyProject".
 
 ```powershell
-.\Get-AdoGitRepos.ps1 -OrgName "myorganisation" -ProjectName "MyProject"
+.\Get-AdoGitRepos.ps1 -ServerUrl "https://myazdourl" -OrgName "myorganisation" -ProjectName "MyProject"
 ```
 
 Get data of all git repos in all projects of organisation "myorganisation" and write ouput as CSV to file myorganisation-repos.csv.
 
 ```powershell
-.\Get-AdoGitRepos.ps1 -OrgName "myorganisation" | ConvertTo-Csv > myorganisation-repos.csv
+.\Get-AdoGitRepos.ps1 -ServerUrl "https://myazdourl" -OrgName "myorganisation" | ConvertTo-Csv > myorganisation-repos.csv
 ```
 
 ### Parameters
 
-* OrgName (mandatory)  
-  The name of the Azure DevOps organisation to use.
+* OrgName (optional)  
+  The name of the Azure DevOps organisation/project collection to use.
 * ProjectName (optional)  
   The name of the Azure DevOps project where the git repositories are located. If this is omitted information about all repositories in all projects of the specified organisation is returned.
 * ExcludePermissions (optional)  
@@ -84,13 +84,15 @@ Displays the permissions (access control lists) of a specified repository.
 Show permissions (access control lists) set on repository "MyRepo" in project "MyProject" in organisation "myorganisation".
 
 ```powershell
-.\Show-AdoGitRepoPermissions.ps1 -OrgName "myorganisation" -ProjectName "MyProject" -RepoName "MyRepo"
+.\Show-AdoGitRepoPermissions.ps1 -ServerUrl "https://myazdourl" -OrgName "myorganisation" -ProjectName "MyProject" -RepoName "MyRepo"
 ```
 
 ### Parameters
 
-* OrgName (mandatory)  
-  The name of the Azure DevOps organisation to use.
+* ServerUrl (optional)  
+  The URL of the Azure DevOps Server (defaults to "https://dev.azure.com").
+* OrgName (optional)  
+  The name of the Azure DevOps organisation/project collection to use.
 * ProjectName (mandatory)  
   The name of the Azure DevOps project where the git repository is located.
 * RepoName (mandatory)  
@@ -136,13 +138,15 @@ PullRequestBypassPolicy
 Remove all write permissions from the ACL of the repository "MyRepo" in project "MyProject" in organisation "myorganisation".
 
 ```powershell
-.\Remove-AdoGitRepoWritePermissions.ps1 -OrgName "myorganisation" -ProjectName "MyProject" -RepoName "MyRepo"
+.\Remove-AdoGitRepoWritePermissions.ps1 -ServerUrl "https://myazdourl" -OrgName "myorganisation" -ProjectName "MyProject" -RepoName "MyRepo"
 ```
 
 ### Parameters
 
-* OrgName (mandatory)  
-  The name of the Azure DevOps organisation to use.
+* ServerUrl (optional)  
+  The URL of the Azure DevOps Server (defaults to "https://dev.azure.com").
+* OrgName (optional)  
+  The name of the Azure DevOps organisation/project collection to use.
 * ProjectName (mandatory)  
   The name of the Azure DevOps project where the git repository is located.
 * RepoName (mandatory)  
@@ -164,23 +168,25 @@ Get contents of one or more variable groups.
 Get variable group "MyVariableGroup" in project "MyProject" in organisation "myorganisation".
 
 ```powershell
-.\Get-AdoVariableGroups.ps1 -OrgName "myorganisation" -ProjectName "MyProject" -VargroupNames @( "MyVariableGroup" )
+.\Get-AdoVariableGroups.ps1 -ServerUrl "https://myazdourl" -OrgName "myorganisation" -ProjectName "MyProject" -VargroupNames @( "MyVariableGroup" )
 ```
 
 Get variable groups "MyGroup.Dev" and "MyGroup.Prod" in project "MyProject" in organisation "myorganisation" as CSV to file mygroup-vars.csv.
 
 ```powershell
-.\Get-AdoVariableGroups.ps1 -OrgName "myorganisation" -ProjectName "MyProject" -VargroupNames @( "MyGroup.Dev", "MyGroup.Prod" ) | ConvertTo-Csv > mygroup-vars.csv
+.\Get-AdoVariableGroups.ps1 -ServerUrl "https://myazdourl" -OrgName "myorganisation" -ProjectName "MyProject" -VargroupNames @( "MyGroup.Dev", "MyGroup.Prod" ) | ConvertTo-Csv > mygroup-vars.csv
 ```
 
 ### Parameters
 
-* OrgName (mandatory)  
-  The name of the Azure DevOps organisation to use.
+* ServerUrl (optional)  
+  The URL of the Azure DevOps Server (defaults to "https://dev.azure.com").
+* OrgName (optional)  
+  The name of the Azure DevOps organisation/project collection to use.
 * ProjectName (mandatory)  
   The name of the Azure DevOps project where the variable group is located.
-* VargroupName (mandatory)  
-  The name of the variable group.
+* VargroupNames (mandatory)  
+  The names of the variable groups.
 * Raw (optional)  
   If this is set, the script will return raw objects instead of flattened key-value collections. This is suitable to keep all information returned by the API for subsequent processing.
 
@@ -198,14 +204,16 @@ Searches and displays variables according to specified name and value search pat
 Find and display all variables containing the string "-legacy" in all variables with names starting with "ServerName" or `HostName" in the variable groups "MyVarGroup.Dev", "MyVarGroup.Test" and "MyVarGroup.Prod" in the project "MyProject" in organisation "myorganisation".
 
 ```powershell
-.\Update-AdoVariables.ps1 -OrgName "myorganisation" -ProjectName "MyProject" -VargroupNames @( "MyVarGroup.Dev", "MyVarGroup.Test", "MyVarGroup.Prod" ) -VariableNameExpressions @( "ServerName.*", "HostName.*" ) -ValueMatchExpression "-legacy"
+.\Update-AdoVariables.ps1 -ServerUrl "https://myazdourl" -OrgName "myorganisation" -ProjectName "MyProject" -VargroupNames @( "MyVarGroup.Dev", "MyVarGroup.Test", "MyVarGroup.Prod" ) -VariableNameExpressions @( "ServerName.*", "HostName.*" ) -ValueMatchExpression "-legacy"
 
 ```
 
 ### Parameters
 
-* OrgName (mandatory)  
-  The name of the Azure DevOps organisation to use.
+* ServerUrl (optional)  
+  The URL of the Azure DevOps Server (defaults to "https://dev.azure.com").
+* OrgName (optional)  
+  The name of the Azure DevOps organisation/project collection to use.
 * ProjectName (mandatory)  
   The name of the Azure DevOps project where the variable group is located.
 * VargroupNames (mandatory)  
@@ -214,6 +222,36 @@ Find and display all variables containing the string "-legacy" in all variables 
   A list of regular expressions to select the names of the variables to process. It this is omitted, all variables in the specified groups will be processed.
 * ValueMatchExpression (optional)  
   A regular expression to select variables by their value.
+
+### PAT Permissions
+
+* Azure DevOps PAT token permission: __Project and Team: read__ and __Variable Groups: read__
+
+
+## Show-AdoVariables
+
+Performs regex search in variable values of one or more variable groups.
+
+### Usage
+
+Search the string "-legacy" in all variables with names starting with "ServerName" or `HostName" in the variable groups "MyVarGroup.Dev", "MyVarGroup.Test" and "MyVarGroup.Prod" in the project "MyProject" in organisation "myorganisation".
+
+```powershell
+.\Show-AdoVariables.ps1 -ServerUrl "https://myazdourl" -OrgName "myorganisation" -ProjectName "MyProject" -VargroupNames @( "MyVarGroup.Dev", "MyVarGroup.Test", "MyVarGroup.Prod" ) -VariableNameExpressions @( "ServerName.*", "HostName.*" ) -ValueMatchExpression "-legacy"
+```
+
+### Parameters
+
+* ServerUrl (optional)  
+  The URL of the Azure DevOps Server (defaults to "https://dev.azure.com").
+* OrgName (optional)  
+  The name of the Azure DevOps organisation/project collection to use.
+* ProjectName (mandatory)  
+  The name of the Azure DevOps project where the variable group is located.
+* VargroupNames (mandatory)  
+  A list of names of variable groups to process.
+* VariableNameExpressions (optional)  
+  A list of regular expressions to select the names of the variables to process. It this is omitted, all variables in the specified groups will be processed.
 
 ### PAT Permissions
 
@@ -229,13 +267,15 @@ Performs regex replacing in variable values of one or more variable groups.
 Replace the string "-legacy" with "-azure" in all variables with names starting with "ServerName" or `HostName" in the variable groups "MyVarGroup.Dev", "MyVarGroup.Test" and "MyVarGroup.Prod" in the project "MyProject" in organisation "myorganisation".
 
 ```powershell
-.\Update-AdoVariables.ps1 -OrgName "myorganisation" -ProjectName "MyProject" -VargroupNames @( "MyVarGroup.Dev", "MyVarGroup.Test", "MyVarGroup.Prod" ) -VariableNameExpressions @( "ServerName.*", "HostName.*" ) -ValueMatchExpression "-legacy" -ValueReplaceExpression "-azure"
+.\Update-AdoVariables.ps1 -ServerUrl "https://myazdourl" -OrgName "myorganisation" -ProjectName "MyProject" -VargroupNames @( "MyVarGroup.Dev", "MyVarGroup.Test", "MyVarGroup.Prod" ) -VariableNameExpressions @( "ServerName.*", "HostName.*" ) -ValueMatchExpression "-legacy" -ValueReplaceExpression "-azure"
 ```
 
 ### Parameters
 
-* OrgName (mandatory)  
-  The name of the Azure DevOps organisation to use.
+* ServerUrl (optional)  
+  The URL of the Azure DevOps Server (defaults to "https://dev.azure.com").
+* OrgName (optional)  
+  The name of the Azure DevOps organisation/project collection to use.
 * ProjectName (mandatory)  
   The name of the Azure DevOps project where the variable group is located.
 * VargroupNames (mandatory)  

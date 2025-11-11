@@ -2,6 +2,10 @@
 param (
     [Parameter(Mandatory)]
     [string]
+    $ServerUrl,
+
+    [Parameter(Mandatory)]
+    [string]
     $OrgName,
 
     [Parameter()]
@@ -16,6 +20,10 @@ param (
 function GetReposOfProject
 {
     param (
+        [Parameter(Mandatory)]
+        [string]
+        $serverUrl,
+
         [Parameter(Mandatory)]
         [string]
         $orgName,
@@ -33,7 +41,7 @@ function GetReposOfProject
 
     Write-Debug "Checking repos for org: $orgName, project: $projectName"
 
-    $requestUrl = "https://dev.azure.com/$orgName/$projectName/_apis/git/repositories?includeLinks=true&includeAllUrls=true&includeHidden=true&api-version=7.0"
+    $requestUrl = "$serverUrl/$orgName/$projectName/_apis/git/repositories?includeLinks=true&includeAllUrls=true&includeHidden=true&api-version=7.0"
     $repos = & "$PSScriptRoot\Helpers\Call-ApiWithToken.ps1" -Url $requestUrl
 
     foreach ($repo in $repos.value)
@@ -78,6 +86,10 @@ function AddLastCommitInfo
     param (
         [Parameter(Mandatory)]
         [string]
+        $serverUrl,
+
+        [Parameter(Mandatory)]
+        [string]
         $orgName,
 
         [Parameter(Mandatory)]
@@ -92,7 +104,7 @@ function AddLastCommitInfo
         $repoObj
     )
 
-    $requestUrl = "https://dev.azure.com/$orgName/$projectName/_apis/git/repositories/$gitRepoId/commits?api-version=6.1-preview.1"
+    $requestUrl = "$serverUrl/$orgName/$projectName/_apis/git/repositories/$gitRepoId/commits?api-version=6.1-preview.1"
     $commitInfos = & "$PSScriptRoot\Helpers\Call-ApiWithToken.ps1" -Url $requestUrl
     if ($null -eq $commitInfos)
     {
@@ -100,7 +112,7 @@ function AddLastCommitInfo
     }
     $lastCommitId = $commitInfos.value.commitId | Select-Object -first 1
 
-    $requestUrl = "https://dev.azure.com/$orgName/$projectName/_apis/git/repositories/$gitRepoId/commits/$($lastCommitId)?api-version=6.0-preview.1"
+    $requestUrl = "$serverUrl/$orgName/$projectName/_apis/git/repositories/$gitRepoId/commits/$($lastCommitId)?api-version=6.0-preview.1"
     $lastCommitInfo = & "$PSScriptRoot\Helpers\Call-ApiWithToken.ps1" -Url $requestUrl
     if ($null -eq $lastCommitInfo)
     {
@@ -119,6 +131,10 @@ function AddPermissionsInfo
     param (
         [Parameter(Mandatory)]
         [string]
+        $serverUrl,
+
+        [Parameter(Mandatory)]
+        [string]
         $orgName,
 
         [Parameter(Mandatory)]
@@ -132,7 +148,7 @@ function AddPermissionsInfo
         $repoObj
     )
 
-    $acls = & "$PSScriptRoot\Helpers\Get-RepoPermissions.ps1" -OrgName $orgName -GitSecNamespace $gitSecNamespace -GitRepoId $gitRepoId
+    $acls = & "$PSScriptRoot\Helpers\Get-RepoPermissions.ps1" -ServerUrl $serverUrl -OrgName $orgName -GitSecNamespace $gitSecNamespace -GitRepoId $gitRepoId
     if ($null -eq $acls)
     {
         return
@@ -178,7 +194,7 @@ function AddAclPermissionProperties
 
 if (-not $ExcludePermissions.IsPresent)
 {
-    $gitSecNamespace = & "$PSScriptRoot\Helpers\Get-RepoSecurityNamespace.ps1" -OrgName $OrgName
+    $gitSecNamespace = & "$PSScriptRoot\Helpers\Get-RepoSecurityNamespace.ps1" -ServerUrl $ServerUrl -OrgName $OrgName
     if ($null -eq $gitSecNamespace)
     {
         Write-Error "Git repos security namespace not found found for org $OrgName"
@@ -189,15 +205,15 @@ if (-not $ExcludePermissions.IsPresent)
 if ($ProjectName -eq "")
 {
     # Get repos from all projects
-    $requestUrl = "https://dev.azure.com/$OrgName/_apis/projects?api-version=7.0"
+    $requestUrl = "$ServerUrl/$OrgName/_apis/projects?api-version=7.0"
     $projects = & "$PSScriptRoot\Helpers\Call-ApiWithToken.ps1" $requestUrl
     foreach ($project in $projects.Value)
     {
-        GetReposOfProject -orgName $OrgName -projectName $project.Name -excludePermissions $ExcludePermissions -gitSecNamespace $gitSecNamespace
+        GetReposOfProject -serverUrl $ServerUrl -orgName $OrgName -projectName $project.Name -excludePermissions $ExcludePermissions -gitSecNamespace $gitSecNamespace
     }
 }
 else
 {
     # Get only repos from specified project
-    GetReposOfProject -orgName $OrgName -projectName $ProjectName -excludePermissions $ExcludePermissions -gitSecNamespace $gitSecNamespace
+    GetReposOfProject -serverUrl $ServerUrl -orgName $OrgName -projectName $ProjectName -excludePermissions $ExcludePermissions -gitSecNamespace $gitSecNamespace
 }

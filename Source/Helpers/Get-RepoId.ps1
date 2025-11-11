@@ -2,6 +2,10 @@
 param (
     [Parameter(Mandatory)]
     [string]
+    $ServerUrl,
+
+    [Parameter(Mandatory)]
+    [string]
     $OrgName,
 
     [Parameter(Mandatory)]
@@ -13,6 +17,6 @@ param (
     $RepoName
 )
 
-$requestUrl = "https://dev.azure.com/$OrgName/$ProjectName/_apis/git/repositories/$($RepoName)?api-version=7.1-preview.1"
+$requestUrl = "$ServerUrl/$OrgName/$ProjectName/_apis/git/repositories/$($RepoName)?api-version=7.1-preview.1"
 $repoResponse = & "$PSScriptRoot\Call-ApiWithToken.ps1" -Url $requestUrl
 $repoResponse.id

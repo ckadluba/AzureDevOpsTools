@@ -2,6 +2,10 @@
 param (
     [Parameter(Mandatory)]
     [string]
+    $ServerUrl,
+
+    [Parameter(Mandatory)]
+    [string]
     $OrgName,
 
     [Parameter(Mandatory)]
@@ -17,6 +21,10 @@ param (
 function DisplayGitRepoAcls
 {
     param (
+        [Parameter(Mandatory)]
+        [string]
+        $serverUrl,
+
         [Parameter(Mandatory)]
         [string]
         $orgName,
@@ -39,7 +47,7 @@ function DisplayGitRepoAcls
         foreach ($ace in $acl.acesDictionary.PSObject.Properties)
         {
             Write-Host "    - ACE"
-            $identityName = GetIdentityName -orgName $orgName -descriptor $ace.Value.descriptor -identitiesCache $identitiesCache
+            $identityName = GetIdentityName -serverUrl $ServerUrl -orgName $orgName -descriptor $ace.Value.descriptor -identitiesCache $identitiesCache
             Write-Host "      Descriptor: $identityName"
             $allowPerms = RenderPermissionsValue -bits $ace.Value.extendedInfo.effectiveAllow -actions $gitSecActions
             Write-Host "      Allow: $allowPerms"
@@ -52,6 +60,10 @@ function DisplayGitRepoAcls
 function GetIdentityName
 {
     param (
+        [Parameter(Mandatory)]
+        [string]
+        $serverUrl,
+
         [Parameter(Mandatory)]
         [string]
         $orgName,
@@ -67,6 +79,7 @@ function GetIdentityName
     $displayName = $identitiesCache[$descriptor]
     if ($null -eq $displayName)
     {
+        # TODO Use specified $serverUrl
         $requestUrl =  "https://vssps.dev.azure.com/$orgName/_apis/identities?descriptors=$($descriptor)"
         $response = & "$PSScriptRoot\Call-ApiWithToken.ps1" -Url $requestUrl
         $displayName = $response[0].DisplayName
@@ -105,5 +118,5 @@ function ExpandPermissions($bits, $actions)
 
 if ($null -ne $Acls)
 {
-    DisplayGitRepoAcls -orgName $OrgName -acls $Acls -gitSecActions $GitSecNamespace.actions -identitiesCache $IdentitiesCache
+    DisplayGitRepoAcls -serverUrl $ServerUrl -orgName $OrgName -acls $Acls -gitSecActions $GitSecNamespace.actions -identitiesCache $IdentitiesCache
 }

@@ -2,6 +2,10 @@
 param (
     [Parameter(Mandatory)]
     [string]
+    $ServerUrl,
+
+    [Parameter(Mandatory)]
+    [string]
     $OrgName,
 
     [Parameter(Mandatory)]
@@ -79,6 +83,10 @@ function UpdateVariableGroups
     param (
         [Parameter(Mandatory)]
         [string]
+        $serverUrl,
+
+        [Parameter(Mandatory)]
+        [string]
         $orgName,
 
         [Parameter(Mandatory)]
@@ -91,7 +99,7 @@ function UpdateVariableGroups
 
     foreach ($vargroup in $newVargroups)
     {
-        $requestUrl = "https://dev.azure.com/$orgName/$projectName/_apis/distributedtask/variablegroups/$($vargroup.Id)?api-version=7.1-preview.2"
+        $requestUrl = "$serverUrl/$orgName/$projectName/_apis/distributedtask/variablegroups/$($vargroup.Id)?api-version=7.1-preview.2"
         & "$PSScriptRoot\Helpers\Call-ApiWithToken.ps1" -Url $requestUrl -Method "PUT" -Body $vargroup | Out-Null
     }
 }
@@ -100,7 +108,7 @@ function UpdateVariableGroups
 # Begin of main script
 
 Write-Host "Updating variables in org: $OrgName, project: $ProjectName"
-$vargroups = & "$PSScriptRoot\Get-AdoVariableGroups.ps1" -OrgName $OrgName -ProjectName $ProjectName -VargroupNames $VargroupNames -Raw
+$vargroups = & "$PSScriptRoot\Get-AdoVariableGroups.ps1" -ServerUrl $ServerUrl -OrgName $OrgName -ProjectName $ProjectName -VargroupNames $VargroupNames -Raw
 if ($null -eq $vargroups)
 {
     Write-Error "Specified variable groups not found in org: $OrgName, project $ProjectName!"
@@ -132,4 +140,4 @@ if (-not $Confirm.IsPresent)
 }
 
 Write-Host "Updating variables"
-UpdateVariableGroups -orgName $OrgName -projectName $ProjectName -newVargroups $fullVargroups
+UpdateVariableGroups -serverUrl $ServerUrl -orgName $OrgName -projectName $ProjectName -newVargroups $fullVargroups

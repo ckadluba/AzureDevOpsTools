@@ -2,6 +2,10 @@
 param (
     [Parameter(Mandatory)]
     [string]
+    $ServerUrl,
+
+    [Parameter(Mandatory)]
+    [string]
     $OrgName,
 
     [Parameter(Mandatory)]
@@ -41,7 +45,7 @@ function ShowMatchedVariables
 # Begin of main script
 
 Write-Host "Searching variables in org: $OrgName, project: $ProjectName"
-$vargroups = & "$PSScriptRoot\Get-AdoVariableGroups.ps1" -OrgName $OrgName -ProjectName $ProjectName -VargroupNames $VargroupNames -Raw
+$vargroups = & "$PSScriptRoot\Get-AdoVariableGroups.ps1" -ServerUrl $ServerUrl -OrgName $OrgName -ProjectName $ProjectName -VargroupNames $VargroupNames -Raw
 if ($null -eq $vargroups)
 {
     Write-Error "Specified variable groups not found in org: $OrgName, project $ProjectName!"

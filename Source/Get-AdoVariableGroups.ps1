@@ -2,6 +2,10 @@
 param (
     [Parameter(Mandatory)]
     [string]
+    $ServerUrl,
+
+    [Parameter(Mandatory)]
+    [string]
     $OrgName,
 
     [Parameter(Mandatory)]
@@ -45,6 +49,10 @@ function GetProjectIdByName
     param (
         [Parameter(Mandatory)]
         [string]
+        $serverUrl,
+
+        [Parameter(Mandatory)]
+        [string]
         $orgName,
 
         [Parameter(Mandatory)]
@@ -52,7 +60,7 @@ function GetProjectIdByName
         $projectName
     )
 
-    $projects = & "$PSScriptRoot\Helpers\Call-ApiWithToken.ps1" -Url "https://dev.azure.com/$orgName/_apis/projects?api-version=7.0"
+    $projects = & "$PSScriptRoot\Helpers\Call-ApiWithToken.ps1" -Url "$serverUrl/$orgName/_apis/projects?api-version=7.0"
     $project = $projects.value | Where-Object { $_.name -eq $projectName }
     $project.id
 }
@@ -62,7 +70,7 @@ function GetProjectIdByName
 
 if ($Raw.IsPresent)
 {
-    $projectId = GetProjectIdByName -orgName $OrgName -projectName $ProjectName
+    $projectId = GetProjectIdByName -serverUrl $ServerUrl -orgName $OrgName -projectName $ProjectName
     if ($null -eq $projectId)
     {
         Write-Error "Project $ProjectName in org $OrgName not found!"
@@ -74,7 +82,7 @@ foreach ($vargroupName in $VargroupNames)
 {
     Write-Debug "Getting variable group $vargroupName in org $orgName, project $projectName"
 
-    $requestUrl = "https://dev.azure.com/$OrgName/$ProjectName/_apis/distributedtask/variablegroups?groupName=$($vargroupName)&api-version=7.1-preview.2"
+    $requestUrl = "$ServerUrl/$OrgName/$ProjectName/_apis/distributedtask/variablegroups?groupName=$($vargroupName)&api-version=7.1-preview.2"
     $vargroupsResponse = & "$PSScriptRoot\Helpers\Call-ApiWithToken.ps1" -Url $requestUrl
 
     if (($null -ne $vargroupsResponse) -and ($vargroupsResponse.Count -eq 1))

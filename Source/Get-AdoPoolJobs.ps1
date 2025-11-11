@@ -2,6 +2,10 @@
 param (
     [Parameter(Mandatory)]
     [string]
+    $ServerUrl,
+
+    [Parameter(Mandatory)]
+    [string]
     $OrgName,
 
     [Parameter(Mandatory)]
@@ -14,6 +18,10 @@ function GetPoolId
     param (
         [Parameter(Mandatory)]
         [string]
+        $serverUrl,
+
+        [Parameter(Mandatory)]
+        [string]
         $orgName,
 
         [Parameter(Mandatory)]
@@ -23,11 +31,11 @@ function GetPoolId
 
     Write-Debug "Get pool Id"
 
-    $requestUrl = "https://dev.azure.com/$OrgName/_apis/projects?api-version=7.0"
+    $requestUrl = "$serverUrl/$OrgName/_apis/projects?api-version=7.0"
     $projectsResponse = & "$PSScriptRoot\Helpers\Call-ApiWithToken.ps1" -Url $requestUrl
     foreach ($project in $projectsResponse.Value)
     {
-        $requestUrl = "https://dev.azure.com/$OrgName/$($project.Name)/_apis/distributedtask/queues?api-version=7.1-preview.1"
+        $requestUrl = "$serverUrl/$OrgName/$($project.Name)/_apis/distributedtask/queues?api-version=7.1-preview.1"
         $queuesResponse = & "$PSScriptRoot\Helpers\Call-ApiWithToken.ps1" -Url $requestUrl
         foreach ($queue in $queuesResponse.Value)
         {
@@ -87,13 +95,14 @@ function ReturnJobInfo
 
 # This is simple way to gather running jobs but it is using undocumented APIs
 
-$poolId = GetPoolId -orgName $OrgName -poolName $PoolName
+$poolId = GetPoolId -serverUrl $ServerUrl -orgName $OrgName -poolName $PoolName
 if ($null -eq $poolId)
 {
     Write-Error "Pool $PoolName not found in organisation $OrgName"
     exit 1
 }
 
+# TODO Use $ServerUrl
 $requestUrl = "https://$OrgName.visualstudio.com/_apis/distributedtask/pools/$poolId/jobrequests"
 $jobsResponse = & "$PSScriptRoot\Helpers\Call-ApiWithToken.ps1" -Url $requestUrl
 foreach ($job in $jobsResponse.Value)
