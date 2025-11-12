@@ -93,7 +93,7 @@ Show permissions (access control lists) set on repository "MyRepo" in project "M
   The URL of the Azure DevOps Server (defaults to "https://dev.azure.com").
 * OrgName (optional)  
   The name of the Azure DevOps organisation/project collection to use.
-* ProjectName (mandatory)  
+* ProjectName (optional)  
   The name of the Azure DevOps project where the git repository is located.
 * RepoName (mandatory)  
   The name of the Azure DevOps git repository where the permissions should be changed.
@@ -147,7 +147,7 @@ Remove all write permissions from the ACL of the repository "MyRepo" in project 
   The URL of the Azure DevOps Server (defaults to "https://dev.azure.com").
 * OrgName (optional)  
   The name of the Azure DevOps organisation/project collection to use.
-* ProjectName (mandatory)  
+* ProjectName (optional)  
   The name of the Azure DevOps project where the git repository is located.
 * RepoName (mandatory)  
   The name of the Azure DevOps git repository where the permissions should be changed.
@@ -189,7 +189,7 @@ Get all variable groups in project "MyProject" in organisation "myorganisation" 
   The URL of the Azure DevOps Server (defaults to "https://dev.azure.com").
 * OrgName (optional)  
   The name of the Azure DevOps organisation/project collection to use.
-* ProjectName (mandatory)  
+* ProjectName (optional)  
   The name of the Azure DevOps project where the variable group is located.
 * VargroupNames (mandatory)  
   The names of the variable groups. Use `@("*")` to match all.
@@ -220,7 +220,7 @@ Find and display all variables containing the string "-legacy" in all variables 
   The URL of the Azure DevOps Server (defaults to "https://dev.azure.com").
 * OrgName (optional)  
   The name of the Azure DevOps organisation/project collection to use.
-* ProjectName (mandatory)  
+* ProjectName (optional)  
   The name of the Azure DevOps project where the variable group is located.
 * VargroupNames (mandatory)  
   A list of names of variable groups to process. Use `@("*")` to match all.
@@ -258,7 +258,7 @@ Search the string "-legacy" in all variables with names starting with "ServerNam
   The URL of the Azure DevOps Server (defaults to "https://dev.azure.com").
 * OrgName (optional)  
   The name of the Azure DevOps organisation/project collection to use.
-* ProjectName (mandatory)  
+* ProjectName (optional)  
   The name of the Azure DevOps project where the variable group is located.
 * VargroupNames (mandatory)  
   A list of names of variable groups to process. Use `@("*")` to match all.
@@ -294,7 +294,7 @@ Replace the string "-legacy" with "-azure" in all variables with names starting 
   The URL of the Azure DevOps Server (defaults to "https://dev.azure.com").
 * OrgName (optional)  
   The name of the Azure DevOps organisation/project collection to use.
-* ProjectName (mandatory)  
+* ProjectName (optional)  
   The name of the Azure DevOps project where the variable group is located.
 * VargroupNames (mandatory)  
   A list of names of variable groups to process. Use `@("*")` to match all.
